@@ -10,9 +10,9 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
-	<artifactId>spring_boot_backend_template</artifactId>
+	<artifactId>TradeStorm</artifactId>
 	<version>0.0.1</version>
-	<name>spring_boot_backend_template</name>
+	<name>TradeStorm</name>
 	<description>Spring Boot Template project for developing REST APIs in a Full
 		Stack Application</description>
 	<url />
