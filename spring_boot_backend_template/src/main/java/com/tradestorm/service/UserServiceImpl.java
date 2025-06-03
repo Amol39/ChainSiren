@@ -2,6 +2,7 @@
 package com.tradestorm.service;
 
 import com.tradestorm.dto.UserDTO;
+import com.tradestorm.dto.UserReqDTO;
 import com.cdac.model.*;
 import com.tradestorm.repository.UserRepository;
 import org.modelmapper.ModelMapper;
@@ -21,7 +22,7 @@ public class UserServiceImpl implements UserService {
     private ModelMapper modelMapper;
 
     @Override
-    public UserDTO registerUser(UserDTO userDTO) {
+    public UserDTO registerUser(UserReqDTO userDTO) {
         if (userRepo.existsByEmail(userDTO.getEmail()))
             throw new RuntimeException("User already exists");
 

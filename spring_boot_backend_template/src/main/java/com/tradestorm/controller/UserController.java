@@ -2,6 +2,7 @@
 package com.tradestorm.controller;
 
 import com.tradestorm.dto.UserDTO;
+import com.tradestorm.dto.UserReqDTO;
 import com.tradestorm.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +16,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<?> registerUser(@RequestBody UserReqDTO userDTO) {
         return ResponseEntity.ok(userService.registerUser(userDTO));
     }
 
