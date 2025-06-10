@@ -1,6 +1,7 @@
 package com.tradestorm.service;
 
 import com.cdac.model.Cryptocurrency;
+import com.tradestorm.custome_exception.CryptoNotFoundException;
 import com.tradestorm.repository.CryptocurrencyRepository;
 
 import lombok.AllArgsConstructor;
@@ -43,9 +44,11 @@ public class CryptocurrencyServiceImpl implements CryptocurrencyService {
 	}
 
 	@Override
-	public Optional<Cryptocurrency> getBySymbol(String symbol) {
-		return cryptocurrencyRepository.findBySymbol(symbol);
+	public Cryptocurrency getBySymbol(String symbol) {
+	    return cryptocurrencyRepository.findBySymbol(symbol)
+	        .orElseThrow(() -> new CryptoNotFoundException("Crypto not found with symbol: " + symbol));
 	}
+
 
 	@Override
 	public void updatePrice(String symbol, BigDecimal newPrice) {

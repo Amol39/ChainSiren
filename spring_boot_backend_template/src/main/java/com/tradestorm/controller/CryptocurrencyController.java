@@ -34,4 +34,9 @@ public class CryptocurrencyController {
     public void deleteCrypto(@PathVariable String symbol) {
         cryptoService.deleteBySymbol(symbol);
     }
+    @GetMapping("/{symbol}")
+    public ResponseEntity<Cryptocurrency> getBySymbol(@PathVariable String symbol) {
+        return ResponseEntity.ok(cryptoService.getBySymbol(symbol));
+    }
+
 }

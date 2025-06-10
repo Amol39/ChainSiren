@@ -1,7 +1,6 @@
 // UserController.java
 package com.tradestorm.controller;
 
-import com.tradestorm.dto.UserDTO;
 import com.tradestorm.dto.UserReqDTO;
 import com.tradestorm.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

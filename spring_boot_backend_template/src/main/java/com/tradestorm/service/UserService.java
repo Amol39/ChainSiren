@@ -7,7 +7,7 @@ import com.tradestorm.dto.UserReqDTO;
 import java.util.List;
 
 public interface UserService {
-    UserDTO registerUser(UserReqDTO userDTO);
-    List<UserDTO> getAllUsers();
-    UserDTO getUserById(Long userId);
+    UserDTO registerUser(UserReqDTO userDTO); // user sign in
+    List<UserDTO> getAllUsers(); // admin operations
+    UserDTO getUserById(Long userId); // notificatio or subscription / scheduler
 }

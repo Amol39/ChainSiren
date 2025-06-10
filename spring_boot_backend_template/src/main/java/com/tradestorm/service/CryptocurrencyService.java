@@ -4,7 +4,6 @@ import com.cdac.model.Cryptocurrency;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 public interface CryptocurrencyService {
 
@@ -12,7 +11,7 @@ public interface CryptocurrencyService {
 
     List<Cryptocurrency> getAllCryptos();
 
-    Optional<Cryptocurrency> getBySymbol(String symbol);
+    Cryptocurrency getBySymbol(String symbol);
 
     void updatePrice(String symbol, BigDecimal newPrice);
 
