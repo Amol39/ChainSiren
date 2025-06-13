@@ -37,7 +37,7 @@ public class User {
 
 
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-	private List<Subscription> subscriptions;
+	private List<Alert> alerts;
 
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
 	private List<Notification> notifications;

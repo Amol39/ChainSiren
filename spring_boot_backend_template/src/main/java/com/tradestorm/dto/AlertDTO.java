@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
-public class SubscriptionDTO {
+public class AlertDTO {
 
     @Schema(example = "101")
     private Long userId;

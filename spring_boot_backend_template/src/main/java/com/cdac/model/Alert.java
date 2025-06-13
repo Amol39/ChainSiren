@@ -17,16 +17,16 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "subscriptions")
+@Table(name = "alerts")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(hidden = true)
-public class Subscription {
+public class Alert {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long subId;
+	private Long alertId;
 
 	private BigDecimal alertPrice;
 	private LocalDateTime createdAt;

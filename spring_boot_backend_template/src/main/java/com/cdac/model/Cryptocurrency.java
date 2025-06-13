@@ -28,7 +28,7 @@ public class Cryptocurrency {
 	private LocalDateTime lastUpdated;
 
 	@OneToMany(mappedBy = "cryptocurrency", cascade = CascadeType.ALL)
-	private List<Subscription> subscriptions;
+	private List<Alert> subscriptions;
 
 	@OneToMany(mappedBy = "cryptocurrency", cascade = CascadeType.ALL)
 	private List<Notification> notifications;
