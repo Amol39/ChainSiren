@@ -8,12 +8,15 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 @Entity
 @Table(name = "cryptocurrencies")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(hidden = true)
 public class Cryptocurrency {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestTemplate;
 
+
 @SpringBootApplication // includes @Configuration
 @ComponentScan(basePackages = { "com.cdac", "com.tradestorm" })
 @EnableJpaRepositories(basePackages = "com.tradestorm.repository")
@@ -51,5 +52,5 @@ public class Application {
 	public RestTemplate restTemplate() {
 		return new RestTemplate();
 	}
-
+	
 }

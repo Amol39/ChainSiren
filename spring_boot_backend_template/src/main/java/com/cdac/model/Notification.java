@@ -2,6 +2,7 @@ package com.cdac.model;
 
 import java.time.LocalDateTime;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,6 +21,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(hidden = true)
 public class Notification {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
