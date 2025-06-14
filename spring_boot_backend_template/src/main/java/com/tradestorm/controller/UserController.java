@@ -1,3 +1,4 @@
+// Updated UserController.java
 package com.tradestorm.controller;
 
 import com.tradestorm.dto.UserReqDTO;
@@ -17,7 +18,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @Operation(summary = "Register a new user", description = "Creates a new user account with name, email, and password.")
+    @Operation(summary = "Register a new user", description = "Creates a new user account with a 7-day free trial.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "User registered successfully"),
         @ApiResponse(responseCode = "400", description = "Invalid request data")

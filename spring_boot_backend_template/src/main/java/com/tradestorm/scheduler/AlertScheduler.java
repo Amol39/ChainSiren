@@ -29,9 +29,9 @@ public class AlertScheduler {
         List<Alert> alerts = alertRepository.findAll();
         List<CryptoDTO> liveCoins = marketService.getAllCryptos();
 
-        for (Alert sub : alerts) {
-            String symbol = sub.getCryptocurrency().getSymbol();
-            BigDecimal alertPrice = sub.getAlertPrice();
+        for (Alert alert : alerts) {
+            String symbol = alert.getCryptocurrency().getSymbol();
+            BigDecimal alertPrice = alert.getAlertPrice();
 
             liveCoins.stream()
                 .filter(coin -> coin.getSymbol().equalsIgnoreCase(symbol))
@@ -40,9 +40,17 @@ public class AlertScheduler {
                     BigDecimal livePrice = liveCoin.getCurrentPrice();
 
                     if (livePrice.compareTo(alertPrice) <= 0) {
-                        User user = sub.getUser();
-                        Cryptocurrency crypto = sub.getCryptocurrency();
+                        User user = alert.getUser();
+
+                        // ✅ Check if subscription is still valid
+                        if (user.getSubscription() == null || !user.getSubscription().isActive()) {
+                            return;
+                        }
+
+                        Cryptocurrency crypto = alert.getCryptocurrency();
                         String message = symbol + " dropped to $" + livePrice + ", below alert $" + alertPrice;
+
+                        // Avoid duplicate notifications (handled inside NotificationService)
                         notificationService.createNotification(message, user, crypto);
                     }
                 });
