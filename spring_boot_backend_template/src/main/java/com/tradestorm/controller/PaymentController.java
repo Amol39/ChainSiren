@@ -4,7 +4,9 @@ import com.cdac.model.User;
 import com.tradestorm.service.UserService;
 import com.razorpay.Order;
 import com.razorpay.RazorpayClient;
+
 import lombok.RequiredArgsConstructor;
+
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,7 @@ import static com.tradestorm.util.Utils.*;
 
 @RestController
 @RequestMapping("/api/payments")
+//@AllArgsConstructor
 @RequiredArgsConstructor
 public class PaymentController {
 

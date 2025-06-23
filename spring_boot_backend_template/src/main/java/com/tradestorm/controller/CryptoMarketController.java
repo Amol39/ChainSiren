@@ -48,6 +48,11 @@ public class CryptoMarketController {
     public ResponseEntity<?> getMostActive() {
         return ResponseEntity.ok(marketService.getMostActive());
     }
+    
+    @GetMapping("/top-volume")
+    public ResponseEntity<?> getTopVolume() {
+        return ResponseEntity.ok(marketService.getTopVolume());
+    }
 
     @Operation(summary = "Get newly listed coins")
     @GetMapping("/new")

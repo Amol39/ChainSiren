@@ -25,4 +25,6 @@ public interface CryptoMarketService {
 	MarketVolumeDTO getVolumeSummary();
 
 	MarketCapDTO getMarketCap();
+	
+	List<CryptoDTO> getTopVolume();
 }

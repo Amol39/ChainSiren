@@ -3,12 +3,14 @@ package com.tradestorm.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Schema(description = "User data returned in responses")
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class UserDTO {
 
     @Schema(description = "Unique identifier of the user", example = "101")
