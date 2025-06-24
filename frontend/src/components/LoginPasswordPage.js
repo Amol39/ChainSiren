@@ -2,6 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import logo from "../assets/logo.png";
 import axios from "axios";
+import { useLogin } from "../context/LoginContext"; // ✅ NEW
 
 export default function LoginPasswordPage() {
     const location = useLocation();
@@ -10,7 +11,8 @@ export default function LoginPasswordPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    const identifier = location.state?.identifier || ""; // ✅ updated
+    const { login } = useLogin(); // ✅ use login from context
+    const identifier = location.state?.identifier || "";
 
     // ✅ Redirect if already logged in
     useEffect(() => {
@@ -27,12 +29,15 @@ export default function LoginPasswordPage() {
 
         try {
             const response = await axios.post("http://localhost:8080/api/auth/login", {
-                identifier, // ✅ send either email or phone
+                identifier,
                 password,
             });
 
-            localStorage.setItem("token", response.data.token);
+            // ✅ Call login() to update context
+            login(response.data.token);
+            localStorage.setItem("userId", response.data.userId);
             navigate("/dashboard");
+
         } catch (err) {
             console.error(err);
             setError("Invalid email/phone or password.");

@@ -7,11 +7,39 @@ import { FaGoogle, FaApple, FaTelegram, FaUser, FaQrcode } from "react-icons/fa"
 
 export default function LoginPage() {
     const [identifier, setIdentifier] = useState("");
+    const [errorMsg, setErrorMsg] = useState("");
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
-    const handleNext = () => {
-        if (!identifier) return alert("Please enter your email or phone number");
-        navigate("/login-password", { state: { identifier } }); // ✅ send as `identifier`
+    const handleNext = async () => {
+        setErrorMsg("");
+
+        const trimmed = identifier.trim();
+        if (!trimmed) {
+            setErrorMsg("Please enter your email or phone number");
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const res = await fetch("http://localhost:8080/api/auth/check-user", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: trimmed, mode: "login" })
+            });
+
+            if (res.ok) {
+                navigate("/login-password", { state: { identifier: trimmed } });
+            } else {
+                const data = await res.json();
+                setErrorMsg(data?.error || "User not found. Please create an account.");
+            }
+        } catch (err) {
+            console.error("Error checking user:", err);
+            setErrorMsg("Something went wrong. Please try again.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -66,13 +94,21 @@ export default function LoginPage() {
                         color: "#fff",
                         fontSize: "13px",
                         width: "100%",
-                        marginBottom: "14px",
+                        marginBottom: "6px",
                         boxSizing: "border-box",
                     }}
                 />
 
+                {/* 👇 Error or Info Message */}
+                {errorMsg && (
+                    <div style={{ fontSize: "12px", color: "#f6465d", marginBottom: "12px" }}>
+                        {errorMsg}
+                    </div>
+                )}
+
                 <button
                     onClick={handleNext}
+                    disabled={loading}
                     style={{
                         width: "100%",
                         backgroundColor: "#fcd535",
@@ -84,9 +120,10 @@ export default function LoginPage() {
                         border: "none",
                         cursor: "pointer",
                         marginBottom: "20px",
+                        opacity: loading ? 0.7 : 1,
                     }}
                 >
-                    Next
+                    {loading ? "Checking..." : "Next"}
                 </button>
 
                 <div style={{ display: "flex", alignItems: "center", margin: "20px 0" }}>
