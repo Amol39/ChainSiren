@@ -8,7 +8,6 @@ export default function CreateAccountDetailsPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const identifierFromSignup = location.state?.email || ""; // can be email or phone
-
   const isEmailSignup = identifierFromSignup.includes("@");
 
   const [fullName, setFullName] = useState("");
@@ -25,6 +24,18 @@ export default function CreateAccountDetailsPage() {
   const isPasswordValid =
     password.length >= 8 && /[A-Z]/.test(password) && /\d/.test(password);
 
+  const getPasswordStrength = (pwd) => {
+    let score = 0;
+    if (pwd.length >= 8) score++;
+    if (/[A-Z]/.test(pwd)) score++;
+    if (/\d/.test(pwd)) score++;
+    if (/[!@#$%^&*(),.?":{}|<>]/.test(pwd)) score++;
+
+    if (score <= 1) return { label: "Weak", color: "red", width: "33%" };
+    if (score === 2 || score === 3) return { label: "Medium", color: "#fcd535", width: "66%" };
+    return { label: "Strong", color: "#3fb68b", width: "100%" };
+  };
+
   const checkAvailability = async (field, value) => {
     if (!value) return;
     try {
@@ -40,13 +51,11 @@ export default function CreateAccountDetailsPage() {
   };
 
   const handleSubmit = async (e) => {
-    if (e) e.preventDefault();
-
+    e.preventDefault();
     setError("");
     setSuccess("");
     setHint("");
 
-    // Phone validation
     if (!/^\d{10}$/.test(phone)) {
       setError("Phone number must be exactly 10 digits.");
       return;
@@ -67,6 +76,8 @@ export default function CreateAccountDetailsPage() {
     }
   };
 
+  const passwordStrength = getPasswordStrength(password);
+
   return (
     <div style={containerStyle}>
       <form onSubmit={handleSubmit} style={formStyle}>
@@ -81,12 +92,7 @@ export default function CreateAccountDetailsPage() {
               type="email"
               value={email}
               readOnly
-              style={{
-                ...inputStyle,
-                backgroundColor: "#1e2329",
-                color: "#888",
-                cursor: "not-allowed",
-              }}
+              style={{ ...inputStyle, backgroundColor: "#1e2329", color: "#888", cursor: "not-allowed" }}
             />
           </>
         ) : (
@@ -96,12 +102,7 @@ export default function CreateAccountDetailsPage() {
               type="text"
               value={phone}
               readOnly
-              style={{
-                ...inputStyle,
-                backgroundColor: "#1e2329",
-                color: "#888",
-                cursor: "not-allowed",
-              }}
+              style={{ ...inputStyle, backgroundColor: "#1e2329", color: "#888", cursor: "not-allowed" }}
             />
           </>
         )}
@@ -117,7 +118,7 @@ export default function CreateAccountDetailsPage() {
           required
         />
 
-        {/* Editable field: phone or email */}
+        {/* Editable Email/Phone */}
         {!isEmailSignup ? (
           <>
             <label style={{ ...labelStyle, marginTop: "18px" }}>Email Address</label>
@@ -160,7 +161,7 @@ export default function CreateAccountDetailsPage() {
           </>
         )}
 
-        {/* Hint below */}
+        {/* Hint */}
         {hint && (
           <div
             style={{
@@ -204,16 +205,51 @@ export default function CreateAccountDetailsPage() {
           </span>
         </div>
 
-        {/* Password Hints */}
+        {/* Password Strength Indicator */}
+        {password && (
+          <div style={{ marginTop: "8px", marginBottom: "16px" }}>
+            <div
+              style={{
+                height: "6px",
+                width: "100%",
+                backgroundColor: "#2b3139",
+                borderRadius: "4px",
+                overflow: "hidden",
+              }}
+            >
+              <div
+                style={{
+                  height: "100%",
+                  width: passwordStrength.width,
+                  backgroundColor: passwordStrength.color,
+                  transition: "width 0.3s",
+                }}
+              ></div>
+            </div>
+            <span
+              style={{
+                fontSize: "12px",
+                color: passwordStrength.color,
+                fontWeight: "bold",
+              }}
+            >
+              {passwordStrength.label}
+            </span>
+          </div>
+        )}
+
+        {/* Password Requirements */}
         <ul style={hintStyle}>
           <li>8 to 128 characters</li>
           <li>At least 1 number</li>
           <li>At least 1 uppercase letter</li>
         </ul>
 
+        {/* Errors and Success */}
         {error && <p style={{ color: "red", fontSize: "13px" }}>{error}</p>}
         {success && <p style={{ color: "green", fontSize: "13px" }}>{success}</p>}
 
+        {/* Submit */}
         <button type="submit" style={submitButtonStyle}>
           Sign Up
         </button>
@@ -230,6 +266,7 @@ const Header = () => (
     </span>
   </div>
 );
+
 
 // Styles
 const containerStyle = {
