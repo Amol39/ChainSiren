@@ -46,6 +46,12 @@ export default function CreateAccountDetailsPage() {
     setSuccess("");
     setHint("");
 
+    // Phone validation
+    if (!/^\d{10}$/.test(phone)) {
+      setError("Phone number must be exactly 10 digits.");
+      return;
+    }
+
     try {
       await axios.post("http://localhost:8080/api/users/register", {
         name: fullName,
@@ -108,6 +114,7 @@ export default function CreateAccountDetailsPage() {
           onChange={(e) => setFullName(e.target.value)}
           placeholder="Enter your full name"
           style={inputStyle}
+          required
         />
 
         {/* Editable field: phone or email */}
@@ -120,6 +127,7 @@ export default function CreateAccountDetailsPage() {
               onChange={(e) => setEmail(e.target.value)}
               onBlur={() => checkAvailability("email", email)}
               placeholder="Enter your email"
+              required
               style={inputStyle}
             />
           </>
@@ -129,18 +137,41 @@ export default function CreateAccountDetailsPage() {
             <input
               type="text"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              onBlur={() => {
-                if (phone.length === 10) checkAvailability("phone", phone);
+              onChange={(e) => {
+                const value = e.target.value;
+                if (/^\d{0,10}$/.test(value)) {
+                  setPhone(value);
+                  if (value.length === 10) {
+                    checkAvailability("phone", value);
+                  } else {
+                    setHint("");
+                  }
+                }
               }}
               placeholder="Enter phone number"
+              required
               style={inputStyle}
             />
+            {phone && phone.length !== 10 && (
+              <p style={{ color: "red", fontSize: "12px", marginBottom: "6px" }}>
+                Phone number must be exactly 10 digits.
+              </p>
+            )}
           </>
         )}
 
         {/* Hint below */}
-        {hint && <div style={{ fontSize: "12px", color: hint.startsWith("✅") ? "green" : "red", marginBottom: "10px" }}>{hint}</div>}
+        {hint && (
+          <div
+            style={{
+              fontSize: "12px",
+              color: hint.startsWith("✅") ? "green" : "red",
+              marginBottom: "10px",
+            }}
+          >
+            {hint}
+          </div>
+        )}
 
         {/* Password */}
         <label style={{ ...labelStyle, marginTop: "18px" }}>Password</label>
@@ -150,6 +181,7 @@ export default function CreateAccountDetailsPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Create a password"
+            required
             style={{
               ...inputStyle,
               paddingRight: "40px",
@@ -193,7 +225,9 @@ export default function CreateAccountDetailsPage() {
 const Header = () => (
   <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "32px" }}>
     <img src={logo} alt="logo" style={{ height: "28px" }} />
-    <span style={{ color: "#fcd535", fontWeight: "bold", fontSize: "20px" }}>CHAIN SIREN</span>
+    <span style={{ color: "#fcd535", fontWeight: "bold", fontSize: "20px" }}>
+      CHAIN SIREN
+    </span>
   </div>
 );
 
