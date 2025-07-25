@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { CurrencyProvider } from '../context/CurrencyContext';
-import { LoginProvider, useLogin } from "../context/LoginContext"; // ✅ NEW
+import { LoginProvider, useLogin } from "../context/LoginContext";
 
 import Layout from "../components/Layout";
 import UserHeader from "../components/UserHeader";
@@ -17,9 +17,10 @@ import SignupPage from '../components/SignupPage';
 import EmailVerificationPage from '../components/EmailVerificationPage';
 import CreateAccountDetailsPage from "../components/CreateAccountDetailsPage";
 import MarketsPage from "../components/MarketsPage";
+import WatchlistPage from "../components/WatchlistPage"; // ✅ Added import
 
 function AppContent() {
-  const { isLoggedIn } = useLogin(); // ✅ reactive login state
+  const { isLoggedIn } = useLogin();
 
   return (
     <>
@@ -50,6 +51,12 @@ function AppContent() {
         <Route path="/dashboard" element={
           <Layout>
             <CoverComponent />
+          </Layout>
+        } />
+
+        <Route path="/watchlist" element={
+          <Layout>
+            <WatchlistPage /> {/* ✅ Watchlist route added here */}
           </Layout>
         } />
       </Routes>
