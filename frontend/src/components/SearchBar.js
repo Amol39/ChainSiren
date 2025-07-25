@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FaSearch } from "react-icons/fa";
 import axios from "axios";
 import { useCurrency } from "../context/CurrencyContext";
+import WatchlistButton from "./WatchlistButton";
 
 export default function SearchBar() {
   const [searchActive, setSearchActive] = useState(false);
@@ -109,7 +110,8 @@ export default function SearchBar() {
           {searchQuery && filteredResults.length > 0 ? (
             <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
               {filteredResults.map((coin, idx) => (
-                <li key={coin.id}
+                <li
+                  key={coin.id}
                   onClick={() => {
                     setSearchActive(false);
                     setSearchQuery("");
@@ -126,6 +128,9 @@ export default function SearchBar() {
                   }}
                 >
                   <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <div onClick={(e) => e.stopPropagation()}>
+                      <WatchlistButton symbol={coin.symbol} />
+                    </div>
                     <span style={{ fontSize: "12px", color: "#777" }}>{idx + 1}.</span>
                     <img src={coin.image} alt={coin.symbol} width="18" height="18" />
                     <span style={{ fontWeight: 500 }}>{coin.symbol.toUpperCase()}</span>
@@ -165,6 +170,9 @@ export default function SearchBar() {
                   }}
                 >
                   <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <div onClick={(e) => e.stopPropagation()}>
+                      <WatchlistButton symbol={coin.symbol} />
+                    </div>
                     <span style={{ fontSize: "12px", color: "#777" }}>{idx + 1}.</span>
                     <img src={coin.image} alt={coin.symbol} width="18" height="18" />
                     <span style={{ fontWeight: 500 }}>{coin.symbol.toUpperCase()}</span>

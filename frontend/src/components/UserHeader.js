@@ -7,7 +7,7 @@ import axios from "axios";
 import logo from "../assets/logo.png";
 import { useCurrency } from "../context/CurrencyContext";
 import { useLogin } from "../context/LoginContext";
-import SearchBar from "./SearchBar"; // ✅ Reusable SearchBar
+import SearchBar from "./SearchBar";
 
 export default function UserHeader() {
   const [hasNewNotification, setHasNewNotification] = useState(false);
@@ -56,13 +56,32 @@ export default function UserHeader() {
       height: "60px",
       color: "#fff"
     }}>
+      {/* Left Logo */}
       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
         <img src={logo} alt="logo" style={{ height: "24px" }} />
         <span style={{ color: "#fcd535", fontWeight: "bold", fontSize: "16px" }}>CHAIN SIREN</span>
       </div>
 
+      {/* Right Icons */}
       <div style={{ display: "flex", alignItems: "center", position: "relative" }}>
         <SearchBar />
+
+        {/* ⭐ Watchlist Button */}
+        <button
+          onClick={() => navigate("/watchlist")}
+          style={{
+            backgroundColor: "#1e2329",
+            border: "1px solid #fcd535",
+            color: "#fcd535",
+            borderRadius: "6px",
+            padding: "6px 10px",
+            marginLeft: "10px",
+            fontSize: "0.8rem",
+            cursor: "pointer"
+          }}
+        >
+          ⭐ Watchlist
+        </button>
 
         <FaUser style={iconStyle} />
         <div style={{ position: "relative" }}>
@@ -81,6 +100,8 @@ export default function UserHeader() {
         </div>
 
         <FaGlobe style={iconStyle} />
+
+        {/* Currency Switch */}
         <div style={{ position: "relative" }}>
           <FaMoneyBillWave style={iconStyle} onClick={() => setShowCurrencyDropdown(prev => !prev)} />
           {showCurrencyDropdown && (
@@ -115,6 +136,7 @@ export default function UserHeader() {
           )}
         </div>
 
+        {/* Logout */}
         <button
           onClick={handleLogout}
           style={{
