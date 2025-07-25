@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useCurrency } from "../context/CurrencyContext";
-import HeadeComponents from '../components/HeadeComponents';
-import FooterComponent from "./FooterComponent";
+import WatchlistButton from "./WatchlistButton";
 
 const cardConfigs = [
   { title: "Hot Coins", endpoint: "most-active", key: "hot-coins" },
@@ -31,16 +30,11 @@ export default function MarketsPage() {
 
   return (
     <div style={{ background: "#0b0e11", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-      
-      {/* ✅ Header */}
-      <HeadeComponents />
-
-      {/* Cards Section with top spacing */}
       <div
         style={{
           flex: 1,
           padding: "2rem",
-          paddingTop: "6rem", // ✅ Added spacing below header
+          paddingTop: "6rem",
           display: "flex",
           flexWrap: "wrap",
           justifyContent: "center",
@@ -62,11 +56,8 @@ export default function MarketsPage() {
               minHeight: "460px",
             }}
           >
-            <div style={{ fontSize: "20px", fontWeight: 600, marginBottom: "16px" }}>
-              {card.title}
-            </div>
+            <div style={{ fontSize: "20px", fontWeight: 600, marginBottom: "16px" }}>{card.title}</div>
 
-            {/* Column headers */}
             <div
               style={{
                 display: "grid",
@@ -82,7 +73,6 @@ export default function MarketsPage() {
               <div>24h %</div>
             </div>
 
-            {/* Coin rows */}
             {data[card.key]?.map((coin, index) => (
               <div
                 key={coin.id}
@@ -94,8 +84,8 @@ export default function MarketsPage() {
                   fontSize: "14px",
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <span style={{ fontSize: "13px", color: "#888" }}>{index + 1}.</span>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <WatchlistButton symbol={coin.symbol} />
                   {coin.image && (
                     <img
                       src={coin.image}
@@ -131,9 +121,6 @@ export default function MarketsPage() {
           </div>
         ))}
       </div>
-
-      {/* ✅ Footer */}
-      <FooterComponent />
     </div>
   );
 }

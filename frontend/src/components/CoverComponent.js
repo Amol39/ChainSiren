@@ -4,11 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import { useCurrency } from "../context/CurrencyContext";
 import graph from "../assets/graph.png";
 import MarketOverviewCards from "./MarketOverviewCards";
+import WatchlistButton from "./WatchlistButton";
 
 export default function CoverComponent() {
   const [cryptoData, setCryptoData] = useState([]);
   const [visibleCount, setVisibleCount] = useState(6);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // ✅ New state
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
   const { currency, getSymbol, convertPrice } = useCurrency();
   const coverRef = useRef(null);
@@ -37,7 +38,6 @@ export default function CoverComponent() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // ✅ Detect login state
   useEffect(() => {
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token);
@@ -60,12 +60,8 @@ export default function CoverComponent() {
       <div className='cover_top'>
         <h1>Buy Bitcoin with {currency}</h1>
         <p>Join the world's largest crypto exchange. Designed for India</p>
-
-        {/* ✅ Conditionally render Register button */}
         {!isLoggedIn && (
-          <button className="yellow_button" onClick={() => navigate("/signup")}>
-            Register Now
-          </button>
+          <button className="yellow_button" onClick={() => navigate("/signup")}>Register Now</button>
         )}
       </div>
 
@@ -82,7 +78,10 @@ export default function CoverComponent() {
                   <div className="comp_top_head">
                     <img src={coin.image} alt={coin.name} />
                     <div>
-                      <h2>{coin.symbol.toUpperCase()}/{currency}</h2>
+                      <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                        <WatchlistButton symbol={coin.symbol} />
+                        <h2>{coin.symbol.toUpperCase()}/{currency}</h2>
+                      </div>
                       <p>Volume {getSymbol()}{convertPrice(coin.total_volume)}</p>
                     </div>
                     <p className={coin.price_change_percentage_24h >= 0 ? "color_green" : "color_red"}>
@@ -120,6 +119,7 @@ export default function CoverComponent() {
               {cryptoData.slice(0, visibleCount).map((coin) => (
                 <div className="price_header" key={coin.id}>
                   <div className="coin_data">
+                    <WatchlistButton symbol={coin.symbol} />
                     <img src={coin.image} alt={coin.name} />
                     <div>
                       <h2 className="coin_name_small">{coin.name}</h2>

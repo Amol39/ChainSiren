@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useCurrency } from "../context/CurrencyContext";
+import WatchlistButton from "./WatchlistButton"; // ✅ Added
 
 const cardConfigs = [
   { title: "Hot", endpoint: "most-active" },
@@ -44,7 +45,6 @@ export default function MarketOverviewCards() {
             <span onClick={() => navigate("/markets")}>More &rsaquo;</span>
           </div>
 
-          {/* Header row for consistency */}
           <div
             style={{
               display: "grid",
@@ -60,7 +60,6 @@ export default function MarketOverviewCards() {
             <div>24h %</div>
           </div>
 
-          {/* Coin data */}
           {data[card.endpoint]?.map((coin, index) => (
             <div
               key={coin.id}
@@ -72,7 +71,8 @@ export default function MarketOverviewCards() {
                 padding: "6px 0",
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <WatchlistButton symbol={coin.symbol} /> {/* ✅ */}
                 <img src={coin.image} alt={coin.name} width="18" height="18" />
                 <span style={{ fontWeight: 500 }}>{coin.symbol.toUpperCase()}</span>
               </div>
