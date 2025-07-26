@@ -79,7 +79,6 @@ export default function WatchlistPage() {
             boxShadow: "0 0 8px rgba(255, 255, 255, 0.05)",
           }}
         >
-          {/* Header Row */}
           <div
             style={{
               display: "grid",
@@ -99,7 +98,6 @@ export default function WatchlistPage() {
             <div>Actions</div>
           </div>
 
-          {/* Data Rows */}
           {coinData.map(
             (coin) =>
               coin && (
@@ -114,7 +112,6 @@ export default function WatchlistPage() {
                       borderBottom: "1px solid #2b3139",
                     }}
                   >
-                    {/* Name + Icon + Symbol + Name */}
                     <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                       <WatchlistButton symbol={coin.symbol} />
                       <img src={coin.image} alt={coin.symbol} width="26" height="26" />
@@ -124,13 +121,11 @@ export default function WatchlistPage() {
                       </div>
                     </div>
 
-                    {/* Price */}
                     <div style={{ textAlign: "center", fontWeight: 500 }}>
                       {getSymbol()}
                       {convertPrice(coin.current_price)}
                     </div>
 
-                    {/* 24h Change */}
                     <div
                       style={{
                         textAlign: "center",
@@ -146,40 +141,67 @@ export default function WatchlistPage() {
                       {coin.price_change_percentage_24h?.toFixed(2)}%
                     </div>
 
-                    {/* 24h Volume */}
                     <div style={{ textAlign: "center", color: "#ccc" }}>
                       ${Number(coin.total_volume / 1e9).toFixed(2)}B
                     </div>
 
-                    {/* Market Cap */}
                     <div style={{ textAlign: "center", color: "#ccc" }}>
                       ${Number(coin.market_cap / 1e12).toFixed(2)}T
                     </div>
 
-                    {/* Action Icon */}
                     <div style={{ textAlign: "center" }}>
                       <FaBullseye
                         style={{ cursor: "pointer", color: "#fcd535" }}
                         title="Set Alert"
                         onClick={() =>
-                          setActiveSymbol((prev) =>
-                            prev === coin.symbol ? null : coin.symbol
-                          )
+                          setActiveSymbol((prev) => (prev === coin.symbol ? null : coin.symbol))
                         }
                       />
                     </div>
                   </div>
 
-                  {/* Conditional AlertComponent row */}
                   {activeSymbol === coin.symbol && (
                     <div
                       style={{
-                        backgroundColor: "#151a1f",
-                        padding: "16px",
-                        borderBottom: "1px solid #2b3139",
+                        position: "fixed",
+                        top: 0,
+                        left: 0,
+                        zIndex: 1000,
+                        width: "100vw",
+                        height: "100vh",
+                        background: "rgba(0, 0, 0, 0.75)",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
                       }}
                     >
-                      <AlertComponent symbol={coin.symbol} />
+                      <div
+                        style={{
+                          backgroundColor: "#111",
+                          padding: "24px",
+                          borderRadius: "8px",
+                          width: "100%",
+                          maxWidth: "400px",
+                          position: "relative",
+                        }}
+                      >
+                        <button
+                          onClick={() => setActiveSymbol(null)}
+                          style={{
+                            position: "absolute",
+                            top: "8px",
+                            right: "12px",
+                            background: "transparent",
+                            color: "#999",
+                            border: "none",
+                            fontSize: "18px",
+                            cursor: "pointer",
+                          }}
+                        >
+                          ✖
+                        </button>
+                        <AlertComponent symbol={coin.symbol} />
+                      </div>
                     </div>
                   )}
                 </div>

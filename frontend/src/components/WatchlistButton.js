@@ -1,5 +1,3 @@
-// src/components/WatchlistButton.js
-
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { FaStar, FaRegStar } from "react-icons/fa";
@@ -17,13 +15,10 @@ export default function WatchlistButton({ symbol }) {
     if (!isLoggedIn || !userId || !symbol) return;
 
     axios
-      .get(`http://localhost:8080/api/watchlist/user/${userId}`, {
+      .get(`http://localhost:8080/api/watchlist/check/${userId}/${symbol}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((res) => {
-        const found = res.data.includes(symbol);
-        setIsInWatchlist(found);
-      })
+      .then((res) => setIsInWatchlist(res.data))
       .catch(console.error)
       .finally(() => setLoading(false));
   }, [symbol, isLoggedIn, userId, token]);
