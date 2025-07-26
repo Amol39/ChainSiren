@@ -1,10 +1,10 @@
 import React from 'react';
-import FacebookIcon 	from '@material-ui/icons/Facebook';
-import TelegramIcon 	from '@material-ui/icons/Telegram';
-import InstagramIcon from '@material-ui/icons/Instagram';
-import YouTubeIcon 		from '@material-ui/icons/YouTube';
-import RedditIcon 	from '@material-ui/icons/Reddit';
-import TwitterIcon	 from '@material-ui/icons/Twitter';
+import FacebookIcon from '@mui/icons-material/Facebook';
+import TelegramIcon from '@mui/icons-material/Telegram';
+import InstagramIcon from '@mui/icons-material/Instagram';
+import YouTubeIcon from '@mui/icons-material/YouTube';
+import RedditIcon from '@mui/icons-material/Reddit';
+import TwitterIcon from '@mui/icons-material/Twitter';
 
 const FooterComponent = () => {
 	return (

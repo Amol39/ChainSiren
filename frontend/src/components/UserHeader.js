@@ -1,18 +1,17 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  FaUser, FaGlobe, FaMoneyBillWave
-} from "react-icons/fa";
+import { FaGlobe, FaMoneyBillWave } from "react-icons/fa";
 import logo from "../assets/logo.png";
 import { useCurrency } from "../context/CurrencyContext";
-import { useLogin } from "../context/LoginContext";
 import SearchBar from "./SearchBar";
 import NotificationBell from "./NotificationBell";
+import ProfileDropdown from "./ProfileDropdown";
+import defaultAvatar from "../assets/avatar.png";
 
 export default function UserHeader() {
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
   const { currency, setCurrency } = useCurrency();
-  const { logout } = useLogin();
   const navigate = useNavigate();
 
   const iconStyle = {
@@ -21,9 +20,12 @@ export default function UserHeader() {
     cursor: "pointer"
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate("/");
+  const handleAvatarClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleProfileClose = () => {
+    setAnchorEl(null);
   };
 
   return (
@@ -69,9 +71,25 @@ export default function UserHeader() {
         </button>
 
         {/* Icon Group */}
-        <div style={{ display: "flex", alignItems: "center", gap: "15px", marginLeft: "10px" }}>
-          <FaUser style={iconStyle} />
-          <NotificationBell style={{ ...iconStyle, marginLeft: "-10px", marginRight: "24px" }} />
+        <div style={{ display: "flex", alignItems: "center", gap: "20px", marginLeft: "10px" }}>
+          <NotificationBell style={{ ...iconStyle, marginRight: "-4px" }} />
+
+          {/* Avatar with Dropdown */}
+          <img
+            src={defaultAvatar}
+            alt="Avatar"
+            style={{
+              width: "28px",
+              height: "28px",
+              borderRadius: "50%",
+              cursor: "pointer",
+              marginLeft: "-4px",
+              border: "1px solid #fcd535"
+            }}
+            onClick={handleAvatarClick}
+          />
+          <ProfileDropdown anchorEl={anchorEl} onClose={handleProfileClose} />
+
           <FaGlobe style={iconStyle} />
 
           {/* Currency Switch */}
@@ -112,23 +130,6 @@ export default function UserHeader() {
             )}
           </div>
         </div>
-
-        {/* Logout */}
-        <button
-          onClick={handleLogout}
-          style={{
-            marginLeft: "16px",
-            backgroundColor: "#fcd535",
-            color: "#000",
-            fontWeight: "600",
-            borderRadius: "6px",
-            padding: "6px 12px",
-            border: "none",
-            cursor: "pointer"
-          }}
-        >
-          Logout
-        </button>
       </div>
     </div>
   );

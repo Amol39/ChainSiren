@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import "../app/App.css";
-import AddCircleIcon from '@material-ui/icons/AddCircle';
-import RemoveIcon from '@material-ui/icons/Remove'; // ✅ Keep this
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import RemoveIcon from '@mui/icons-material/Remove';
 
 const FaqChild = ({ item }) => {
   const [state, set_state] = useState(false);
