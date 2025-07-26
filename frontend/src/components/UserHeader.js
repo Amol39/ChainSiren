@@ -1,39 +1,24 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  FaBell, FaUser, FaGlobe, FaMoneyBillWave
+  FaUser, FaGlobe, FaMoneyBillWave
 } from "react-icons/fa";
-import axios from "axios";
 import logo from "../assets/logo.png";
 import { useCurrency } from "../context/CurrencyContext";
 import { useLogin } from "../context/LoginContext";
 import SearchBar from "./SearchBar";
+import NotificationBell from "./NotificationBell";
 
 export default function UserHeader() {
-  const [hasNewNotification, setHasNewNotification] = useState(false);
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
-
-  const token = localStorage.getItem("token");
-  const userId = localStorage.getItem("userId");
-
   const { currency, setCurrency } = useCurrency();
   const { logout } = useLogin();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!token || !userId) return;
-
-    axios.get(`http://localhost:8080/api/notifications/user/${userId}`)
-      .then(res => setHasNewNotification(res.data?.some(n => !n.read)))
-      .catch(console.error);
-  }, [userId, token]);
-
   const iconStyle = {
     color: "#fff",
     fontSize: "18px",
-    cursor: "pointer",
-    margin: "0 10px",
-    position: "relative"
+    cursor: "pointer"
   };
 
   const handleLogout = () => {
@@ -63,7 +48,7 @@ export default function UserHeader() {
       </div>
 
       {/* Right Icons */}
-      <div style={{ display: "flex", alignItems: "center", position: "relative" }}>
+      <div style={{ display: "flex", alignItems: "center" }}>
         <SearchBar />
 
         {/* ⭐ Watchlist Button */}
@@ -83,57 +68,49 @@ export default function UserHeader() {
           ⭐ Watchlist
         </button>
 
-        <FaUser style={iconStyle} />
-        <div style={{ position: "relative" }}>
-          <FaBell style={iconStyle} />
-          {hasNewNotification && (
-            <span style={{
-              position: "absolute",
-              top: "-3px",
-              right: "4px",
-              height: "8px",
-              width: "8px",
-              backgroundColor: "#fcd535",
-              borderRadius: "50%"
-            }} />
-          )}
-        </div>
+        {/* Icon Group */}
+        <div style={{ display: "flex", alignItems: "center", gap: "15px", marginLeft: "10px" }}>
+          <FaUser style={iconStyle} />
+          <NotificationBell style={{ ...iconStyle, marginLeft: "-10px", marginRight: "24px" }} />
+          <FaGlobe style={iconStyle} />
 
-        <FaGlobe style={iconStyle} />
-
-        {/* Currency Switch */}
-        <div style={{ position: "relative" }}>
-          <FaMoneyBillWave style={iconStyle} onClick={() => setShowCurrencyDropdown(prev => !prev)} />
-          {showCurrencyDropdown && (
-            <div style={{
-              position: "absolute",
-              top: "30px",
-              right: "0",
-              backgroundColor: "#181a20",
-              border: "1px solid #2b3139",
-              borderRadius: "6px",
-              padding: "6px",
-              zIndex: 1000
-            }}>
-              {["USD", "INR"].map((cur) => (
-                <div
-                  key={cur}
-                  onClick={() => {
-                    setCurrency(cur);
-                    setShowCurrencyDropdown(false);
-                  }}
-                  style={{
-                    padding: "6px 12px",
-                    color: "#fff",
-                    cursor: "pointer",
-                    backgroundColor: currency === cur ? "#2b3139" : "transparent"
-                  }}
-                >
-                  {cur}
-                </div>
-              ))}
-            </div>
-          )}
+          {/* Currency Switch */}
+          <div style={{ position: "relative" }}>
+            <FaMoneyBillWave
+              style={iconStyle}
+              onClick={() => setShowCurrencyDropdown(prev => !prev)}
+            />
+            {showCurrencyDropdown && (
+              <div style={{
+                position: "absolute",
+                top: "30px",
+                right: "0",
+                backgroundColor: "#181a20",
+                border: "1px solid #2b3139",
+                borderRadius: "6px",
+                padding: "6px",
+                zIndex: 1000
+              }}>
+                {["USD", "INR"].map((cur) => (
+                  <div
+                    key={cur}
+                    onClick={() => {
+                      setCurrency(cur);
+                      setShowCurrencyDropdown(false);
+                    }}
+                    style={{
+                      padding: "6px 12px",
+                      color: "#fff",
+                      cursor: "pointer",
+                      backgroundColor: currency === cur ? "#2b3139" : "transparent"
+                    }}
+                  >
+                    {cur}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Logout */}

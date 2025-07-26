@@ -18,6 +18,7 @@ import EmailVerificationPage from '../components/EmailVerificationPage';
 import CreateAccountDetailsPage from "../components/CreateAccountDetailsPage";
 import MarketsPage from "../components/MarketsPage";
 import WatchlistPage from "../components/WatchlistPage"; // ✅ Added import
+import MyAlertsPage from "../components/MyAlertsPage";
 
 function AppContent() {
   const { isLoggedIn } = useLogin();
@@ -59,7 +60,15 @@ function AppContent() {
             <WatchlistPage /> {/* ✅ Watchlist route added here */}
           </Layout>
         } />
+
+        <Route path="/alerts" element={
+          <Layout>
+            <MyAlertsPage />
+          </Layout>
+        } />
+
       </Routes>
+
     </>
   );
 }
