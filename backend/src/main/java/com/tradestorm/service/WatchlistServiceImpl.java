@@ -15,46 +15,51 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class WatchlistServiceImpl implements WatchlistService {
 
-    private final WatchlistRepository watchlistRepository;
-    private final UserRepository userRepository;
+	private final WatchlistRepository watchlistRepository;
+	private final UserRepository userRepository;
 
-    @Override
-    public String addToWatchlist(Long userId, String cryptoSymbol) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+	@Override
+	public String addToWatchlist(Long userId, String cryptoSymbol) {
+		User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        boolean alreadyExists = watchlistRepository.existsByUserAndCryptoSymbol(user, cryptoSymbol);
-        if (alreadyExists) {
-            return "Already in watchlist";
-        }
+		boolean alreadyExists = watchlistRepository.existsByUserAndCryptoSymbol(user, cryptoSymbol);
+		if (alreadyExists) {
+			return "Already in watchlist";
+		}
 
-        Watchlist entry = new Watchlist();
-        entry.setUser(user);
-        entry.setCryptoSymbol(cryptoSymbol);
-        watchlistRepository.save(entry);
+		Watchlist entry = new Watchlist();
+		entry.setUser(user);
+		entry.setCryptoSymbol(cryptoSymbol);
+		watchlistRepository.save(entry);
 
-        return "Added to watchlist";
-    }
+		return "Added to watchlist";
+	}
 
-    @Override
-    public void removeFromWatchlist(Long userId, String cryptoSymbol) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+	@Override
+	public void removeFromWatchlist(Long userId, String cryptoSymbol) {
+		User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        Watchlist entry = watchlistRepository.findByUserAndCryptoSymbol(user, cryptoSymbol)
-                .orElseThrow(() -> new IllegalArgumentException("Watchlist entry not found"));
+		Watchlist entry = watchlistRepository.findByUserAndCryptoSymbol(user, cryptoSymbol)
+				.orElseThrow(() -> new IllegalArgumentException("Watchlist entry not found"));
 
-        watchlistRepository.delete(entry);
-    }
+		watchlistRepository.delete(entry);
+	}
 
-    @Override
-    public List<String> getWatchlist(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+	@Override
+	public List<String> getWatchlist(Long userId) {
+		User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        return watchlistRepository.findByUser(user)
-                .stream()
-                .map(Watchlist::getCryptoSymbol)
-                .collect(Collectors.toList());
-    }
+		return watchlistRepository.findByUser(user).stream().map(Watchlist::getCryptoSymbol)
+				.collect(Collectors.toList());
+	}
+
+	@Override
+	public boolean isCoinInWatchlist(Long userId, String symbol) {
+	    User user = userRepository.findById(userId)
+	        .orElseThrow(() -> new RuntimeException("User not found"));
+
+	    return watchlistRepository.existsByUserAndCryptoSymbol(user, symbol);
+	}
+
+
 }

@@ -50,8 +50,8 @@ public class AlertScheduler {
                         Cryptocurrency crypto = alert.getCryptocurrency();
                         String message = symbol + " dropped to $" + livePrice + ", below alert $" + alertPrice;
 
-                        // Avoid duplicate notifications (handled inside NotificationService)
-                        notificationService.createNotification(message, user, crypto);
+                        // ✅ Corrected: pass userId instead of User
+                        notificationService.createNotification(message, user.getUserId(), crypto);
                     }
                 });
         }

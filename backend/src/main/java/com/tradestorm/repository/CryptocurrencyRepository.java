@@ -9,6 +9,8 @@ public interface CryptocurrencyRepository extends JpaRepository<Cryptocurrency, 
 
     // 1. Find cryptocurrency by its symbol (e.g., "btc", "eth")
     Optional<Cryptocurrency> findBySymbol(String symbol);
+    
+    Optional<Cryptocurrency> findBySymbolIgnoreCase(String symbol);
 
     Optional<Cryptocurrency> findByName(String name);
 

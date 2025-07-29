@@ -1,48 +1,91 @@
 package com.tradestorm.service;
 
 import com.tradestorm.dto.LoginRequestDTO;
+import com.tradestorm.dto.OtpRequestDTO;
 import com.cdac.model.User;
 import com.tradestorm.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import lombok.AllArgsConstructor;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.util.Map;
 
 @Service
+@AllArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
-	@Autowired
 	private UserRepository userRepository;
 
-	@Autowired
+	private OtpService otpService;
+
 	private TokenService tokenService;
 
 	@Override
 	public ResponseEntity<?> login(LoginRequestDTO loginRequest) {
-		String email = loginRequest.getEmail().trim();
+		String identifier = loginRequest.getIdentifier().trim();
 		String rawPassword = loginRequest.getPassword().trim();
 
-		System.out.println("🔐 Login attempt for email: " + email);
+		User user = identifier.contains("@") ? userRepository.findByEmail(identifier)
+				: userRepository.findByPhone(identifier);
 
-		User user = userRepository.findByEmail(email);
-
-		if (user == null) {
-			System.out.println("❌ No user found for email: " + email);
-			return ResponseEntity.status(401).body(Map.of("error", "Invalid email or password"));
-		}
-
-		String storedPassword = user.getPassword().trim();
-		System.out.println("🔍 Comparing hashed password with entered password");
-
-		if (!org.springframework.security.crypto.bcrypt.BCrypt.checkpw(rawPassword, storedPassword)) {
-			System.out.println("❌ Password mismatch (BCrypt)");
-			return ResponseEntity.status(401).body(Map.of("error", "Invalid email or password"));
+		if (user == null
+				|| !org.springframework.security.crypto.bcrypt.BCrypt.checkpw(rawPassword, user.getPassword().trim())) {
+			return ResponseEntity.status(401).body(Map.of("error", "Invalid credentials"));
 		}
 
 		String token = tokenService.generateToken(user);
-		System.out.println("✅ Login successful");
-
 		return ResponseEntity.ok(
 				Map.of("token", token, "userId", user.getUserId(), "name", user.getName(), "email", user.getEmail()));
 	}
+
+	@Override
+	public ResponseEntity<?> sendOtp(Map<String, String> payload) {
+		String email = payload.get("email");
+		if (email == null || email.trim().isEmpty()) {
+			return ResponseEntity.badRequest().body(Map.of("error", "Email is required"));
+		}
+
+		otpService.sendOtp(email);
+		return ResponseEntity.ok(Map.of("message", "OTP sent to " + email));
+	}
+
+	@Override
+	public ResponseEntity<?> verifyOtp(OtpRequestDTO otpRequest) {
+		boolean valid = otpService.verifyOtp(otpRequest.getEmail(), otpRequest.getOtp());
+		if (valid) {
+			return ResponseEntity.ok(Map.of("message", "OTP verified successfully"));
+		} else {
+			return ResponseEntity.status(400).body(Map.of("error", "Invalid or expired OTP"));
+		}
+	}
+
+	@Override
+	public ResponseEntity<?> checkUserExists(Map<String, String> payload) {
+		String identifier = payload.get("email");
+		String mode = payload.getOrDefault("mode", "signup"); // default = signup
+
+		if (identifier == null || identifier.trim().isEmpty()) {
+			return ResponseEntity.badRequest().body(Map.of("error", "Email or phone is required"));
+		}
+
+		boolean exists = userRepository.existsByEmail(identifier) || userRepository.existsByPhone(identifier);
+
+		if (mode.equals("signup")) {
+			if (exists) {
+				return ResponseEntity.status(409).body(Map.of("error", "User already exists"));
+			} else {
+				return ResponseEntity.ok(Map.of("message", "User is unique"));
+			}
+		} else if (mode.equals("login")) {
+			if (exists) {
+				return ResponseEntity.ok(Map.of("message", "User exists"));
+			} else {
+				return ResponseEntity.status(404).body(Map.of("error", "User not found"));
+			}
+		}
+
+		return ResponseEntity.badRequest().body(Map.of("error", "Invalid mode"));
+	}
+
 }

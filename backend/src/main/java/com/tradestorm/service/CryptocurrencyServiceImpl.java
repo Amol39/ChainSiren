@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -39,11 +40,13 @@ public class CryptocurrencyServiceImpl implements CryptocurrencyService {
 	}
 
 	@Override
+	@Cacheable("allCryptos")
 	public List<Cryptocurrency> getAllCryptos() {
 		return cryptocurrencyRepository.findAll();
 	}
 
 	@Override
+	@Cacheable("cryptoBySymbol")
 	public Cryptocurrency getBySymbol(String symbol) {
 	    return cryptocurrencyRepository.findBySymbol(symbol)
 	        .orElseThrow(() -> new CryptoNotFoundException("Crypto not found with symbol: " + symbol));

@@ -33,4 +33,11 @@ public class WatchlistController {
     public ResponseEntity<List<String>> getWatchlist(@PathVariable Long userId) {
         return ResponseEntity.ok(watchlistService.getWatchlist(userId));
     }
+    
+    @GetMapping("/check/{userId}/{symbol}")
+    public ResponseEntity<Boolean> isInWatchlist(@PathVariable Long userId, @PathVariable String symbol) {
+        boolean isPresent = watchlistService.isCoinInWatchlist(userId, symbol);
+        return ResponseEntity.ok(isPresent);
+    }
+    
 }
