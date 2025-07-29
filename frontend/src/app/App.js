@@ -58,9 +58,9 @@ function AppContent() {
         <Route path="/subscription" element={<Layout><SubscriptionPage /></Layout>} />
       </Routes>
 
-      {/* ✅ Toast container at bottom right */}
+      {/* ✅ Toast container at top right */}
       <ToastContainer
-        position="bottom-right"
+        position="top-right"
         autoClose={3000}
         hideProgressBar={false}
         newestOnTop

@@ -3,8 +3,9 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import { useCurrency } from "../context/CurrencyContext";
 import { useLogin } from "../context/LoginContext";
+import { toast } from "react-toastify";
 
-export default function AlertComponent({ symbol: propSymbol }) {
+export default function AlertComponent({ symbol: propSymbol, editingAlert, onFinish }) {
   const { symbol: paramSymbol } = useParams();
   const symbol = propSymbol || paramSymbol;
   const userId = localStorage.getItem("userId");
@@ -16,65 +17,69 @@ export default function AlertComponent({ symbol: propSymbol }) {
   const [targetPrice, setTargetPrice] = useState("");
   const [alertType, setAlertType] = useState("above");
   const [currentPrice, setCurrentPrice] = useState(null);
-  const [feedback, setFeedback] = useState("");
 
-  // Fetch current coin price
+  // Set initial form values
   useEffect(() => {
-    if (!symbol) return;
+    if (editingAlert) {
+      setTargetPrice(editingAlert.alertPrice);
+      setAlertType(editingAlert.alertType);
+    } else if (symbol) {
+      axios
+        .get(`http://localhost:8080/api/market/${symbol}`)
+        .then((res) => {
+          const price = res.data.current_price;
+          setCurrentPrice(price);
+          setTargetPrice(price.toFixed(2));
+        })
+        .catch((err) => console.error("Failed to load coin price:", err));
+    }
+  }, [symbol, editingAlert]);
 
-    axios
-      .get(`http://localhost:8080/api/market/${symbol}`)
-      .then((res) => {
-        const price = res.data.current_price;
-        setCurrentPrice(price);
-        setTargetPrice(price.toFixed(2));
-      })
-      .catch((err) => console.error("Failed to load coin price:", err));
-  }, [symbol]);
-
-  const handleSetAlert = () => {
+  const handleSubmit = () => {
     if (!targetPrice || !isLoggedIn) return;
 
-    axios
-      .post(
-        `http://localhost:8080/api/alerts/add`,
-        {
-          userId,
-          cryptoSymbol: symbol,
-          alertPrice: parseFloat(targetPrice),
-          alertType,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      )
-      .then(() => {
-        setFeedback("✅ Alert set!");
-        setTimeout(() => setFeedback(""), 3000);
-        setTargetPrice(currentPrice?.toFixed(2) || "");
-        setAlertType("above");
-      })
-      .catch((err) => {
-        console.error("Failed to set alert:", err);
-        setFeedback("❌ Failed to set alert");
-      });
+    const payload = {
+      userId,
+      cryptoSymbol: symbol,
+      alertPrice: parseFloat(targetPrice),
+      alertType,
+    };
+
+    const config = { headers: { Authorization: `Bearer ${token}` } };
+
+    if (editingAlert) {
+      // UPDATE alert
+      axios
+        .put(`http://localhost:8080/api/alerts/update/${editingAlert.alertId}`, payload, config)
+        .then(() => {
+          toast.success("✅ Alert updated successfully!");
+          onFinish?.();
+        })
+        .catch(() => toast.error("❌ Failed to update alert"));
+    } else {
+      // CREATE new alert
+      axios
+        .post(`http://localhost:8080/api/alerts/add`, payload, config)
+        .then(() => {
+          toast.success("✅ Alert set successfully!");
+          onFinish?.();
+          setAlertType("above");
+          setTargetPrice(currentPrice?.toFixed(2) || "");
+        })
+        .catch(() => toast.error("❌ Failed to set alert"));
+    }
   };
 
   if (!isLoggedIn) {
     return <p style={{ color: "#f6465d" }}>⚠️ Please log in to set alerts.</p>;
   }
 
-  if (!symbol) {
-    return <p style={{ color: "#f6465d" }}>⚠️ No coin selected.</p>;
-  }
-
   return (
     <div style={{ color: "#fff", padding: "8px 0" }}>
       <h4 style={{ color: "#fcd535", marginBottom: "10px" }}>
-        Set Price Alert for {symbol.toUpperCase()}
+        {editingAlert ? "✏️ Edit Alert" : `Set Price Alert for ${symbol?.toUpperCase()}`}
       </h4>
 
-      {/* Set Alert Form */}
       <div style={{ display: "flex", gap: "12px", alignItems: "center", marginBottom: "12px" }}>
         <input
           type="number"
@@ -104,7 +109,7 @@ export default function AlertComponent({ symbol: propSymbol }) {
           <option value="below">Below</option>
         </select>
         <button
-          onClick={handleSetAlert}
+          onClick={handleSubmit}
           style={{
             padding: "6px 14px",
             backgroundColor: "#fcd535",
@@ -115,25 +120,17 @@ export default function AlertComponent({ symbol: propSymbol }) {
             cursor: "pointer",
           }}
         >
-          Set Alert
+          {editingAlert ? "Update" : "Set Alert"}
         </button>
       </div>
 
-      {/* Display current price */}
-      {currentPrice && (
+      {currentPrice && !editingAlert && (
         <div style={{ marginBottom: "10px", color: "#aaa", fontSize: "13px" }}>
           Current Price:{" "}
           <span style={{ color: "#fff" }}>
             {getSymbol()}
             {convertPrice(currentPrice)}
           </span>
-        </div>
-      )}
-
-      {/* Feedback Message */}
-      {feedback && (
-        <div style={{ color: feedback.startsWith("✅") ? "#0f0" : "#f6465d", fontSize: "13px" }}>
-          {feedback}
         </div>
       )}
     </div>

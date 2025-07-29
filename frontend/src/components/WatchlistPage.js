@@ -200,7 +200,10 @@ export default function WatchlistPage() {
                         >
                           ✖
                         </button>
-                        <AlertComponent symbol={coin.symbol} />
+                        <AlertComponent 
+                        symbol={coin.symbol}
+                        onFinish={()=>setActiveSymbol(null)} 
+                        />
                       </div>
                     </div>
                   )}

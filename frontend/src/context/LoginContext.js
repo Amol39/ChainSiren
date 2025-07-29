@@ -14,14 +14,15 @@ export const LoginProvider = ({ children }) => {
     return () => window.removeEventListener("storage", checkLogin);
   }, []);
 
-  const login = (token) => {
+  const login = (token, userId) => {
     localStorage.setItem("token", token);
+    if (userId) localStorage.setItem("userId", userId);
     setIsLoggedIn(true);
   };
 
   const logout = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("userId"); // ✅ Clear user ID too
+    localStorage.removeItem("userId");
     setIsLoggedIn(false);
   };
 
@@ -31,5 +32,4 @@ export const LoginProvider = ({ children }) => {
     </LoginContext.Provider>
   );
 };
-
 export const useLogin = () => useContext(LoginContext);

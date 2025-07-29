@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { FaStar, FaRegStar } from "react-icons/fa";
 import { useLogin } from "../context/LoginContext";
+import { toast } from 'react-toastify'; 
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function WatchlistButton({ symbol }) {
   const { isLoggedIn } = useLogin();
@@ -19,7 +21,10 @@ export default function WatchlistButton({ symbol }) {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setIsInWatchlist(res.data))
-      .catch(console.error)
+      .catch((err) => {
+        console.error(err);
+        toast.error("Failed to check watchlist status");
+      })
       .finally(() => setLoading(false));
   }, [symbol, isLoggedIn, userId, token]);
 
@@ -32,16 +37,28 @@ export default function WatchlistButton({ symbol }) {
           params: { userId, symbol },
           headers,
         })
-        .then(() => setIsInWatchlist(false))
-        .catch(console.error);
+        .then(() => {
+          setIsInWatchlist(false);
+          toast.success(`${symbol.toUpperCase()} removed from Watchlist`);
+        })
+        .catch((err) => {
+          console.error(err);
+          toast.error("Failed to remove from Watchlist");
+        });
     } else {
       axios
         .post(`http://localhost:8080/api/watchlist/add`, null, {
           params: { userId, symbol },
           headers,
         })
-        .then(() => setIsInWatchlist(true))
-        .catch(console.error);
+        .then(() => {
+          setIsInWatchlist(true);
+          toast.success(`${symbol.toUpperCase()} added to Watchlist`);
+        })
+        .catch((err) => {
+          console.error(err);
+          toast.error("Failed to add to Watchlist");
+        });
     }
   };
 

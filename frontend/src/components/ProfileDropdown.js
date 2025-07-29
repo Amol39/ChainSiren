@@ -1,18 +1,42 @@
 import {
-  Menu, MenuItem, ListItemIcon, Divider, Typography
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  Divider,
+  Typography
 } from "@mui/material";
 import {
-  Person, Settings, Logout, ListAlt, NotificationsActive, CreditCard
+  Person,
+  Settings,
+  Logout,
+  ListAlt,
+  NotificationsActive,
+  CreditCard
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import { useLogin } from "../context/LoginContext";
+import { toast } from "react-toastify";
 
 export default function ProfileDropdown({ anchorEl, onClose }) {
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
+  const { logout } = useLogin();
 
   const handleNavigate = (path) => {
     onClose();
     navigate(path);
+  };
+
+  const handleLogout = () => {
+    logout(); // call context logout
+    onClose();
+    toast.success("Logged out successfully");
+    navigate("/");
+
+    // Optional: force UI reload if some components don't react to context
+    setTimeout(() => {
+      window.location.reload();
+    }, 500); // short delay ensures toast is visible before reload
   };
 
   return (
@@ -64,7 +88,7 @@ export default function ProfileDropdown({ anchorEl, onClose }) {
         <Typography variant="body2">Settings</Typography>
       </MenuItem>
 
-      <MenuItem onClick={() => handleNavigate("/logout")}>
+      <MenuItem onClick={handleLogout}>
         <ListItemIcon><Logout sx={{ color: "#fff" }} /></ListItemIcon>
         <Typography variant="body2">Logout</Typography>
       </MenuItem>

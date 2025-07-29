@@ -4,6 +4,7 @@ import { useLogin } from "../context/LoginContext";
 import { useCurrency } from "../context/CurrencyContext";
 import WatchlistButton from "./WatchlistButton";
 import AlertComponent from "./AlertComponent";
+import { toast } from "react-toastify";
 
 export default function MyAlertsPage() {
   const userId = localStorage.getItem("userId");
@@ -13,12 +14,11 @@ export default function MyAlertsPage() {
 
   const [alerts, setAlerts] = useState([]);
   const [coinImages, setCoinImages] = useState({});
-  const [editingSymbol, setEditingSymbol] = useState(null);
+  const [editingAlert, setEditingAlert] = useState(null);
 
-  useEffect(() => {
+  const fetchAlerts = () => {
     if (!userId || !token) return;
 
-    // Fetch Alerts
     axios
       .get(`http://localhost:8080/api/alerts/user/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -43,6 +43,10 @@ export default function MyAlertsPage() {
         });
       })
       .catch((err) => console.error("Failed to load alerts:", err));
+  };
+
+  useEffect(() => {
+    fetchAlerts();
   }, [userId, token]);
 
   const handleDeleteAlert = (id) => {
@@ -50,11 +54,20 @@ export default function MyAlertsPage() {
       .delete(`http://localhost:8080/api/alerts/delete/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then(() => setAlerts((prev) => prev.filter((a) => a.alertId !== id)))
-      .catch((err) => console.error("Delete failed:", err));
+      .then(() =>{
+        toast.success("✅ Alert deleted successfully")
+        fetchAlerts();
+      })
+      .catch((err) => {
+        console.error("Delete failed:", err);
+        toast.error(" ❌ Failed to delete alert");
+      });
   };
 
-  const closeModal = () => setEditingSymbol(null);
+  const closeModal = () => {
+    setEditingAlert(null);
+    fetchAlerts();
+  };
 
   if (!isLoggedIn)
     return <p style={{ color: "#f6465d" }}>⚠️ Please login to view your alerts.</p>;
@@ -165,7 +178,7 @@ export default function MyAlertsPage() {
                       borderRadius: "4px",
                       cursor: "pointer",
                     }}
-                    onClick={() => setEditingSymbol(a.cryptoSymbol)}
+                    onClick={() => setEditingAlert(a)}
                   >
                     Edit
                   </button>
@@ -191,7 +204,7 @@ export default function MyAlertsPage() {
       )}
 
       {/* Edit Modal */}
-      {editingSymbol && (
+      {editingAlert && (
         <div
           style={{
             position: "fixed",
@@ -231,7 +244,13 @@ export default function MyAlertsPage() {
             >
               ✖
             </button>
-            <AlertComponent symbol={editingSymbol} />
+
+            <AlertComponent
+              editingAlert={editingAlert}
+              symbol={editingAlert.cryptoSymbol}
+              userId={editingAlert.userId}
+              onFinish={closeModal}
+            />
           </div>
         </div>
       )}

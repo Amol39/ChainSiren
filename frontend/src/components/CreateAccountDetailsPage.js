@@ -3,6 +3,7 @@ import logo from "../assets/logo.png";
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function CreateAccountDetailsPage() {
   const navigate = useNavigate();
@@ -50,31 +51,31 @@ export default function CreateAccountDetailsPage() {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-    setSuccess("");
-    setHint("");
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError("");
+  setSuccess("");
+  setHint("");
 
-    if (!/^\d{10}$/.test(phone)) {
-      setError("Phone number must be exactly 10 digits.");
-      return;
-    }
+  if (!/^\d{10}$/.test(phone)) {
+    setError("Phone number must be exactly 10 digits.");
+    return;
+  }
 
-    try {
-      await axios.post("http://localhost:8080/api/users/register", {
-        name: fullName,
-        email,
-        phone,
-        password,
-      });
+  try {
+    await axios.post("http://localhost:8080/api/users/register", {
+      name: fullName,
+      email,
+      phone,
+      password,
+    });
 
-      setSuccess("Account created successfully!");
-      navigate("/login");
-    } catch (err) {
-      setError(err.response?.data?.message || "Registration failed");
-    }
-  };
+    toast.success("🎉 Account created successfully!");
+    navigate("/login");
+  } catch (err) {
+    setError(err.response?.data?.message || "Registration failed");
+  }
+};
 
   const passwordStrength = getPasswordStrength(password);
 
