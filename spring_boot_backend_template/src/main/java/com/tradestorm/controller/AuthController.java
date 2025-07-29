@@ -3,7 +3,7 @@ package com.tradestorm.controller;
 import com.tradestorm.dto.LoginRequestDTO;
 import com.tradestorm.dto.OtpRequestDTO;
 import com.tradestorm.service.AuthService;
-import com.tradestorm.service.OtpService;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,37 +13,30 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-	@Autowired
-	private AuthService authService;
+    @Autowired
+    private AuthService authService;
 
-	@Autowired
-	private OtpService otpService;
+    // 🔐 Login
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequestDTO loginRequest) {
+        return authService.login(loginRequest);
+    }
 
-	// 🔐 Login with email & password
-	@PostMapping("/login")
-	public ResponseEntity<?> login(@RequestBody LoginRequestDTO loginRequest) {
-		return authService.login(loginRequest);
-	}
+    // 📧 Send OTP
+    @PostMapping("/send-otp")
+    public ResponseEntity<?> sendOtp(@RequestBody Map<String, String> payload) {
+        return authService.sendOtp(payload);
+    }
 
-	// 📧 Send OTP to email
-	@PostMapping("/send-otp")
-	public ResponseEntity<?> sendOtp(@RequestBody OtpRequestDTO request) {
-		String email = request.getEmail();
-		if (email == null || email.isBlank()) {
-			return ResponseEntity.badRequest().body("Email is required");
-		}
-		otpService.sendOtp(email);
-		return ResponseEntity.ok("OTP sent to " + email);
-	}
+    // ✅ Verify OTP
+    @PostMapping("/verify-otp")
+    public ResponseEntity<?> verifyOtp(@RequestBody OtpRequestDTO otpRequest) {
+        return authService.verifyOtp(otpRequest);
+    }
 
-	// ✅ Verify OTP
-	@PostMapping("/verify-otp")
-	public ResponseEntity<?> verifyOtp(@RequestBody OtpRequestDTO otpRequest) {
-		boolean valid = otpService.verifyOtp(otpRequest.getEmail(), otpRequest.getOtp());
-		if (valid) {
-			return ResponseEntity.ok("OTP verified successfully");
-		} else {
-			return ResponseEntity.status(400).body("Invalid or expired OTP");
-		}
-	}
+    // 🔍 Check if user exists
+    @PostMapping("/check-user")
+    public ResponseEntity<?> checkUser(@RequestBody Map<String, String> payload) {
+        return authService.checkUserExists(payload);
+    }
 }

@@ -3,7 +3,10 @@ package com.tradestorm.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
+import lombok.Getter;
+
 @Configuration
+@Getter
 public class TwilioConfig {
 
     @Value("${twilio.account-sid}")
@@ -14,16 +17,9 @@ public class TwilioConfig {
 
     @Value("${twilio.phone-number}")
     private String fromNumber;
+    
+    @Value("${twilio.verify-service-sid}")
+    private String verifyServiceSid;
 
-    public String getAccountSid() {
-        return accountSid;
-    }
 
-    public String getAuthToken() {
-        return authToken;
-    }
-
-    public String getFromNumber() {
-        return fromNumber;
-    }
 }

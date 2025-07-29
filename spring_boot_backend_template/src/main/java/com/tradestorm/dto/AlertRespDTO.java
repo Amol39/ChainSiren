@@ -21,12 +21,15 @@ public class AlertRespDTO {
     @Schema(example = "101", description = "User ID associated with the alert")
     private Long userId;
 
-    @Schema(example = "201", description = "Cryptocurrency ID being monitored")
-    private Long cryptoId;
+    @Schema(example = "BTC", description = "Symbol of the cryptocurrency")
+    private String cryptoSymbol;
 
-    @Schema(example = "45000.00", description = "Target alert price set by the user")
+    @Schema(example = "45000.00", description = "Target price set by the user")
     private BigDecimal alertPrice;
 
-    @Schema(example = "2025-06-10T18:30:00.363Z", description = "Timestamp when the alert was created")
+    @Schema(example = "above", description = "Type of alert, e.g., 'above' or 'below'")
+    private String alertType;
+
+    @Schema(example = "2025-06-10T18:30:00.363Z", description = "When the alert was created")
     private LocalDateTime createdAt;
 }

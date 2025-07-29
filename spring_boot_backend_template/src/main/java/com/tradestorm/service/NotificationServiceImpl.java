@@ -5,73 +5,93 @@ import com.cdac.model.Notification;
 import com.cdac.model.User;
 import com.tradestorm.dto.NotificationDTO;
 import com.tradestorm.repository.NotificationRepository;
-import com.tradestorm.util.EmailService;
-import com.tradestorm.util.SmsService;
-
-import lombok.AllArgsConstructor;
-import org.modelmapper.ModelMapper;
+import com.tradestorm.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationRepository notificationRepository;
-    private final ModelMapper modelMapper;
-    private final SmsService smsService;
-    private final EmailService emailService;
-    
-    @Override
-    public NotificationDTO createNotification(String message, User user, Cryptocurrency crypto) {
-        Optional<Notification> existing = notificationRepository.findDuplicate(user, crypto, message);
+    private final UserRepository userRepository;
 
-        if (existing.isPresent()) {
-            return modelMapper.map(existing.get(), NotificationDTO.class);
+    @Override
+    public NotificationDTO createNotification(String message, Long userId, Cryptocurrency crypto) {
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            throw new RuntimeException("User not found with id: " + userId);
+        }
+
+        User user = userOptional.get();
+
+        // ✅ Check for existing notification in the last 1 hour
+        LocalDateTime oneHourAgo = LocalDateTime.now().minusHours(1);
+        boolean exists = notificationRepository.existsByUserAndCryptocurrencyAndMessageAndTimestampAfter(
+                user, crypto, message, oneHourAgo);
+
+        if (exists) {
+            return null; // 🔁 Suppress duplicate notification
         }
 
         Notification notification = new Notification();
-        notification.setMessage(message);
         notification.setUser(user);
         notification.setCryptocurrency(crypto);
+        notification.setMessage(message);
         notification.setTimestamp(LocalDateTime.now());
+        notification.setRead(false);
 
         Notification saved = notificationRepository.save(notification);
-
-        sendUserNotification(user, message); // <== NEW LINE
-
-        return modelMapper.map(saved, NotificationDTO.class);
+        return convertToDTO(saved);
     }
-
-    private void sendUserNotification(User user, String message) {
-        String pref = user.getNotificationPreference(); // Expected: "SMS", "EMAIL", "BOTH"
-
-        if ("EMAIL".equalsIgnoreCase(pref) || "BOTH".equalsIgnoreCase(pref)) {
-        	emailService.sendEmail(user.getEmail(), "Crypto Alert", message);
-        }
-
-        if ("SMS".equalsIgnoreCase(pref) || "BOTH".equalsIgnoreCase(pref)) {
-            smsService.sendSms(user.getPhone(), message);
-        }
-    }
-
 
     @Override
-    public List<NotificationDTO> getUserNotifications(User user) {
-        return notificationRepository.findByUser(user)
-                .stream()
-                .map(n -> modelMapper.map(n, NotificationDTO.class))
+    public List<NotificationDTO> getNotificationsByUserId(Long userId) {
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            throw new RuntimeException("User not found with id: " + userId);
+        }
+
+        List<Notification> notifications = notificationRepository.findByUser(userOptional.get());
+        return notifications.stream()
+                .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<NotificationDTO> getByCryptocurrency(Cryptocurrency crypto) {
-        return notificationRepository.findByCryptocurrency(crypto)
-                .stream()
-                .map(n -> modelMapper.map(n, NotificationDTO.class))
+        List<Notification> notifications = notificationRepository.findByCryptocurrency(crypto);
+        return notifications.stream()
+                .map(this::convertToDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void markAllAsRead(Long userId) {
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            throw new RuntimeException("User not found with id: " + userId);
+        }
+
+        List<Notification> notifications = notificationRepository.findByUser(userOptional.get());
+        notifications.forEach(n -> n.setRead(true));
+        notificationRepository.saveAll(notifications);
+    }
+
+    private NotificationDTO convertToDTO(Notification notification) {
+        NotificationDTO dto = new NotificationDTO();
+        dto.setNotifId(notification.getNotifId());
+        dto.setUserId(notification.getUser().getUserId());
+        dto.setCryptoId(notification.getCryptocurrency().getCryptoId());
+        dto.setMessage(notification.getMessage());
+        dto.setTimestamp(notification.getTimestamp());
+        dto.setRead(notification.getRead());
+        dto.setCryptoSymbol(notification.getCryptocurrency().getSymbol());
+        return dto;
     }
 }

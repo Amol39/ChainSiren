@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,16 +51,34 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public List<UserDTO> getAllUsers() {
-		return userRepo.findAll().stream()
-				.map(user -> modelMapper.map(user, UserDTO.class))
-				.collect(Collectors.toList());
+	    List<User> users = userRepo.findAll();
+	    List<UserDTO> userDTOs = new ArrayList<>();
+
+	    for (User user : users) {
+	        UserDTO dto = new UserDTO();
+	        dto.setUserId(user.getUserId());
+	        dto.setName(user.getName());
+	        dto.setEmail(user.getEmail());
+	        dto.setPhone(user.getPhone());
+	        userDTOs.add(dto);
+	    }
+
+	    return userDTOs;
 	}
+
 
 	@Override
 	public UserDTO getUserById(Long userId) {
-		User user = userRepo.findById(userId)
-				.orElseThrow(() -> new RuntimeException("User not found"));
-		return modelMapper.map(user, UserDTO.class);
+	    User user = userRepo.findById(userId)
+	            .orElseThrow(() -> new RuntimeException("User not found"));
+
+	    UserDTO dto = new UserDTO();
+	    dto.setUserId(user.getUserId());
+	    dto.setName(user.getName());
+	    dto.setEmail(user.getEmail());
+	    dto.setPhone(user.getPhone());
+
+	    return dto;
 	}
 
 	@Override

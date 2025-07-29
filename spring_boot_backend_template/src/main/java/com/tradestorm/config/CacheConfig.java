@@ -14,8 +14,9 @@ public class CacheConfig {
     @Bean
     public CacheManager cacheManager() {
         CaffeineCacheManager cacheManager = new CaffeineCacheManager(
-                "allCryptos", "cryptoById", "cryptoBySymbol", "topGainers",
-                "topLosers", "mostActive", "newlyListed", "volumeSummary","topVolume", "marketCap"
+            // Existing market data
+            "allCryptos", "cryptoById", "cryptoBySymbol", "topGainers",
+            "topLosers", "mostActive", "newlyListed", "volumeSummary", "topVolume", "marketCap"
         );
         cacheManager.setCaffeine(caffeineCacheBuilder());
         return cacheManager;
@@ -23,7 +24,8 @@ public class CacheConfig {
 
     private Caffeine<Object, Object> caffeineCacheBuilder() {
         return Caffeine.newBuilder()
-                .expireAfterWrite(120, TimeUnit.SECONDS) // Cache TTL = 120 seconds
-                .maximumSize(2000); // Optional: prevent memory overuse
+                .recordStats() // ✅ Enable recording statistics to silence Micrometer warnings
+                .expireAfterWrite(120, TimeUnit.SECONDS) // Cache TTL = 2 minutes
+                .maximumSize(2000);
     }
 }

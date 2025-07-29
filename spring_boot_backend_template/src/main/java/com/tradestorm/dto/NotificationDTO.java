@@ -22,4 +22,9 @@ public class NotificationDTO {
 
     @Schema(example = "2025-06-10T18:30:00.363Z")
     private LocalDateTime timestamp;
+
+    private Boolean read;
+
+    @Schema(example = "BTC")
+    private String cryptoSymbol;
 }

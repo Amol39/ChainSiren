@@ -12,11 +12,14 @@ public class AlertDTO {
     @Schema(example = "101")
     private Long userId;
 
-    @Schema(example = "201")
-    private Long cryptoId;
+    @Schema(example = "BTC", description = "Symbol of the cryptocurrency, e.g., BTC, ETH")
+    private String cryptoSymbol;
 
-    @Schema(example = "45000.00")
+    @Schema(example = "45000.00", description = "Target price to trigger alert")
     private BigDecimal alertPrice;
+
+    @Schema(example = "above", description = "Alert type: 'above' or 'below'")
+    private String alertType;
 
     @Schema(example = "2025-06-10T18:30:00.363Z")
     private LocalDateTime createdAt;
