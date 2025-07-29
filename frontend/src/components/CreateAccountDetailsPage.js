@@ -24,6 +24,7 @@ export default function CreateAccountDetailsPage() {
 
   const isPasswordValid =
     password.length >= 8 && /[A-Z]/.test(password) && /\d/.test(password);
+    
 
   const getPasswordStrength = (pwd) => {
     let score = 0;
