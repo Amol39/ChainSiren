@@ -32,6 +32,10 @@ public class User {
 
 	@Column(name = "is_subscribed")
 	private boolean isSubscribed;
+	
+	@Column(name = "is_verified")
+	private boolean isVerified = false; // default false
+
 
 	@Column(name = "subscription_start")
 	private LocalDate subscriptionStart;

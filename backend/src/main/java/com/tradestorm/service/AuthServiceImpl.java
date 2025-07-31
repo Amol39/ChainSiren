@@ -36,7 +36,13 @@ public class AuthServiceImpl implements AuthService {
 
 		String token = tokenService.generateToken(user);
 		return ResponseEntity.ok(
-				Map.of("token", token, "userId", user.getUserId(), "name", user.getName(), "email", user.getEmail()));
+				Map.of(
+						"token", token, 
+						"userId", user.getUserId(),
+						"name", user.getName(), 
+						"email", user.getEmail(),
+						"isVerified", user.isVerified()
+						));
 	}
 
 	@Override
@@ -54,6 +60,9 @@ public class AuthServiceImpl implements AuthService {
 	public ResponseEntity<?> verifyOtp(OtpRequestDTO otpRequest) {
 		boolean valid = otpService.verifyOtp(otpRequest.getEmail(), otpRequest.getOtp());
 		if (valid) {
+			User user = userRepository.findByEmail(otpRequest.getEmail());
+		    user.setVerified(true); 
+		    userRepository.save(user);
 			return ResponseEntity.ok(Map.of("message", "OTP verified successfully"));
 		} else {
 			return ResponseEntity.status(400).body(Map.of("error", "Invalid or expired OTP"));
