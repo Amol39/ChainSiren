@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -26,17 +27,21 @@ public class AuthServiceImpl implements AuthService {
 		String identifier = loginRequest.getIdentifier().trim();
 		String rawPassword = loginRequest.getPassword().trim();
 
-		User user = identifier.contains("@") ? userRepository.findByEmail(identifier)
+		Optional<User> userOptional = identifier.contains("@") ? userRepository.findByEmail(identifier)
 				: userRepository.findByPhone(identifier);
 
-		if (user == null
-				|| !org.springframework.security.crypto.bcrypt.BCrypt.checkpw(rawPassword, user.getPassword().trim())) {
+		if (userOptional.isEmpty()) {
+			return ResponseEntity.status(401).body(Map.of("error", "Invalid credentials"));
+		}
+
+		User user = userOptional.get();
+		if (!org.springframework.security.crypto.bcrypt.BCrypt.checkpw(rawPassword, user.getPassword().trim())) {
 			return ResponseEntity.status(401).body(Map.of("error", "Invalid credentials"));
 		}
 
 		String token = tokenService.generateToken(user);
-		return ResponseEntity.ok(
-				Map.of("token", token, "userId", user.getUserId(), "name", user.getName(), "email", user.getEmail()));
+		return ResponseEntity.ok(Map.of("token", token, "userId", user.getUserId(), "name", user.getName(), "email",
+				user.getEmail(), "isVerified", user.isVerified()));
 	}
 
 	@Override
@@ -52,7 +57,9 @@ public class AuthServiceImpl implements AuthService {
 
 	@Override
 	public ResponseEntity<?> verifyOtp(OtpRequestDTO otpRequest) {
-		boolean valid = otpService.verifyOtp(otpRequest.getEmail(), otpRequest.getOtp());
+		String identifier = otpRequest.getEmail(); // email or phone
+		boolean valid = otpService.verifyOtp(identifier, otpRequest.getOtp());
+
 		if (valid) {
 			return ResponseEntity.ok(Map.of("message", "OTP verified successfully"));
 		} else {

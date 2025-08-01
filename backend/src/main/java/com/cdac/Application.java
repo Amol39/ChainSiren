@@ -6,7 +6,6 @@ import org.modelmapper.convention.MatchingStrategies;
 import org.modelmapper.convention.NameTokenizers;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -18,7 +17,6 @@ import org.springframework.web.client.RestTemplate;
 @SpringBootApplication // includes @Configuration
 @ComponentScan(basePackages = { "com.cdac", "com.tradestorm" })
 @EnableJpaRepositories(basePackages = "com.tradestorm.repository")
-@EntityScan(basePackages = { "com.cdac.model", "com.tradestorm.model" })
 @EnableScheduling
 @EnableCaching
 public class Application {

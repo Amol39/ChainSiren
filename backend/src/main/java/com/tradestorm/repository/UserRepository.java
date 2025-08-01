@@ -1,7 +1,10 @@
-// UserRepository.java
+
 package com.tradestorm.repository;
 
 import com.cdac.model.User;
+
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserRepository extends JpaRepository<User, Long> {
@@ -10,7 +13,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 	boolean existsByPhone(String phone);
 
-	User findByEmail(String email);
+	Optional<User> findByEmail(String email);
 
-	User findByPhone(String phone);
+	Optional<User> findByPhone(String phone);
 }

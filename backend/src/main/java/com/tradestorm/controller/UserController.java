@@ -15,42 +15,45 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/users")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+	@Autowired
+	private UserService userService;
 
-    @Operation(summary = "Register a new user", description = "Creates a new user account with a 7-day free trial.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "User registered successfully"),
-        @ApiResponse(responseCode = "400", description = "Invalid request data")
-    })
-    @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody UserReqDTO userDTO) {
-        return ResponseEntity.ok(userService.registerUser(userDTO));
-    }
+	@Operation(summary = "Register a new user", description = "Creates a new user account with a 7-day free trial.")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "User registered successfully"),
+			@ApiResponse(responseCode = "400", description = "Invalid request data") })
+	@PostMapping("/register")
+	public ResponseEntity<?> registerUser(@RequestBody UserReqDTO userDTO) {
+		return ResponseEntity.ok(userService.registerUser(userDTO));
+	}
 
-    @Operation(summary = "Get all users", description = "Retrieves a list of all registered users.")
-    @GetMapping
-    public ResponseEntity<?> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
-    }
+	@Operation(summary = "Get all users", description = "Retrieves a list of all registered users.")
+	@GetMapping
+	public ResponseEntity<?> getAllUsers() {
+		return ResponseEntity.ok(userService.getAllUsers());
+	}
 
-    @Operation(summary = "Get user by ID", description = "Retrieves user details by their ID.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "User found"),
-        @ApiResponse(responseCode = "404", description = "User not found")
-    })
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getUser(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.getUserById(id));
-    }
+	@Operation(summary = "Get user by ID", description = "Retrieves user details by their ID.")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "User found"),
+			@ApiResponse(responseCode = "404", description = "User not found") })
+	@GetMapping("/{id}")
+	public ResponseEntity<?> getUser(@PathVariable Long id) {
+		return ResponseEntity.ok(userService.getUserById(id));
+	}
 
-    @Operation(summary = "Update user", description = "Updates a user's profile information and notification preferences.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "User updated successfully"),
-        @ApiResponse(responseCode = "404", description = "User not found")
-    })
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UserUpdateDTO updateDTO) {
-        return ResponseEntity.ok(userService.updateUser(id, updateDTO));
-    }
+	@Operation(summary = "Update user", description = "Updates a user's profile information and notification preferences.")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "User updated successfully"),
+			@ApiResponse(responseCode = "404", description = "User not found") })
+	@PutMapping("/{id}")
+	public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UserUpdateDTO updateDTO) {
+		return ResponseEntity.ok(userService.updateUser(id, updateDTO));
+	}
+
+	@Operation(summary = "Get user by phone", description = "Retrieves a user's info using their phone number.")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "User found"),
+			@ApiResponse(responseCode = "404", description = "User not found") })
+	@GetMapping("/by-phone/{phone}")
+	public ResponseEntity<?> getUserByPhone(@PathVariable String phone) {
+		return ResponseEntity.ok(userService.getUserByPhone(phone));
+	}
+
 }
