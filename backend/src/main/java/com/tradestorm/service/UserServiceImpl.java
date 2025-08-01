@@ -80,6 +80,14 @@ public class UserServiceImpl implements UserService {
 
 	    return dto;
 	}
+	
+	@Override
+	public UserDTO getUserByPhone(String phone) {
+	    User user = userRepo.findByPhone(phone)
+	            .orElseThrow(() -> new RuntimeException("User not found"));
+	    return modelMapper.map(user, UserDTO.class);
+	}
+
 
 	@Override
 	public UserDTO updateUser(Long id, UserUpdateDTO updateDTO) {

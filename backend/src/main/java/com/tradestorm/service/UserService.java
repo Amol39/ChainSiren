@@ -15,4 +15,5 @@ public interface UserService {
     UserDTO updateUser(Long id, UserUpdateDTO updateDTO);
     User save(User user);
     User findEntityById(Long userId); // For internal use
+	UserDTO getUserByPhone(String phone);
 }
