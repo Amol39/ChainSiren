@@ -16,7 +16,8 @@ public class CacheConfig {
         CaffeineCacheManager cacheManager = new CaffeineCacheManager(
             // Existing market data
             "allCryptos", "cryptoById", "cryptoBySymbol", "topGainers",
-            "topLosers", "mostActive", "newlyListed", "volumeSummary", "topVolume", "marketCap"
+            "topLosers", "mostActive", "newlyListed", "volumeSummary", "topVolume", "marketCap",
+            "otpRequestTimestamps"
         );
         cacheManager.setCaffeine(caffeineCacheBuilder());
         return cacheManager;
