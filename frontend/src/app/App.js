@@ -77,13 +77,13 @@ function AppContent() {
 
 function App() {
   return (
-    <LoginProvider>
-      <CurrencyProvider>
-        <Router>
+    <Router>
+      <LoginProvider>
+        <CurrencyProvider>
           <AppContent />
-        </Router>
-      </CurrencyProvider>
-    </LoginProvider>
+        </CurrencyProvider>
+      </LoginProvider>
+    </Router>
   );
 }
 
