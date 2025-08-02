@@ -15,16 +15,16 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.UUID;
+
 import static com.tradestorm.util.Utils.*;
 
 @RestController
 @RequestMapping("/api/payments")
-//@AllArgsConstructor
 @RequiredArgsConstructor
 public class PaymentController {
 
     private final UserService userService;
-    
+
     @Value("${razorpay.key}")
     private String razorpayKey;
 
@@ -36,15 +36,17 @@ public class PaymentController {
         try {
             RazorpayClient razorpay = new RazorpayClient(razorpayKey, razorpaySecret);
 
+            // Generate a receipt ID under 40 characters
+            String receipt = "order_rcpt_" + UUID.randomUUID().toString().replace("-", "").substring(0, 20);
+
             JSONObject orderRequest = new JSONObject();
-            orderRequest.put("amount", amountInRupees * 100); // Amount in paise
+            orderRequest.put("amount", amountInRupees * 100); // in paise
             orderRequest.put("currency", "INR");
-            orderRequest.put("receipt", "order_rcpt_" + UUID.randomUUID());
+            orderRequest.put("receipt", receipt);
             orderRequest.put("payment_capture", true);
 
             Order order = razorpay.orders.create(orderRequest);
 
-            // Save order ID in user record for later verification
             User user = userService.findEntityById(userId);
             user.setPaymentOrderId(order.get("id"));
             userService.save(user);
@@ -70,19 +72,19 @@ public class PaymentController {
                 return ResponseEntity.badRequest().body("Invalid payment signature");
             }
 
-            // Mark user as subscribed
+            int duration = data.containsKey("duration") ? Integer.parseInt(data.get("duration")) : 1;
+
             User user = userService.findEntityById(userId);
             user.setSubscribed(true);
             user.setSubscriptionStart(LocalDate.now());
-            user.setSubscriptionEnd(LocalDate.now().plusMonths(1)); // or dynamic based on plan
+            user.setSubscriptionEnd(LocalDate.now().plusMonths(duration));
             user.setPaymentOrderId(orderId);
             user.setPaymentId(paymentId);
             userService.save(user);
 
-            return ResponseEntity.ok("Payment verified and subscription activated");
+            return ResponseEntity.ok("Payment verified and subscription activated for " + duration + " month(s).");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Payment verification failed: " + e.getMessage());
         }
     }
 }
-
