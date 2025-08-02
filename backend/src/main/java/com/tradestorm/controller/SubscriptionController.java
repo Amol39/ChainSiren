@@ -21,4 +21,10 @@ public class SubscriptionController {
     public ResponseEntity<?> isSubscribed(@RequestParam Long userId) {
         return ResponseEntity.ok(subscriptionService.isUserSubscribed(userId));
     }
+    
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<?> getUserSubscription(@PathVariable Long userId) {
+        return ResponseEntity.ok(subscriptionService.getSubscriptionDetails(userId));
+    }
+
 }

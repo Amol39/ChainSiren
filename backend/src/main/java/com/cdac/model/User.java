@@ -66,6 +66,6 @@ public class User {
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "subscription_type")
-	private SubscriptionType subscriptionType;
+	private SubscriptionType subscriptionType = SubscriptionType.TRIAL;
 
 }
