@@ -45,15 +45,16 @@ export default function LoginPasswordPage() {
         password,
       });
 
-      const { token, userId, verified } = response.data;
+      const { token, userId, isVerified } = response.data;
+      const isPhoneLogin = identifier && !identifier.includes("@");
 
-      if (!verified) {
+      if (!isVerified && !isPhoneLogin) {
         toast.info("ℹ️ Please verify your email first");
         navigate("/verify", {
           state: {
             email: registeredEmail,
             isLoginFlow: true,
-            password, // for auto-login after verification
+            password,
           },
         });
         return;
