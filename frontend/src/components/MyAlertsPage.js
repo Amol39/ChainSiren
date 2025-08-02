@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { useLogin } from "../context/LoginContext";
 import { useCurrency } from "../context/CurrencyContext";
@@ -16,7 +16,7 @@ export default function MyAlertsPage() {
   const [coinImages, setCoinImages] = useState({});
   const [editingAlert, setEditingAlert] = useState(null);
 
-  const fetchAlerts = () => {
+  const fetchAlerts = useCallback(() => {
     if (!userId || !token) return;
 
     axios
@@ -43,19 +43,19 @@ export default function MyAlertsPage() {
         });
       })
       .catch((err) => console.error("Failed to load alerts:", err));
-  };
+  }, [userId, token]);
 
   useEffect(() => {
     fetchAlerts();
-  }, [userId, token]);
+  }, [fetchAlerts]);
 
   const handleDeleteAlert = (id) => {
     axios
       .delete(`http://localhost:8080/api/alerts/delete/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then(() =>{
-        toast.success("✅ Alert deleted successfully")
+      .then(() => {
+        toast.success("✅ Alert deleted successfully");
         fetchAlerts();
       })
       .catch((err) => {

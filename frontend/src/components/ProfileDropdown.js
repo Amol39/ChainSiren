@@ -76,7 +76,7 @@ export default function ProfileDropdown({ anchorEl, onClose }) {
         <Typography variant="body2">Notification Preferences</Typography>
       </MenuItem>
 
-      <MenuItem onClick={() => handleNavigate("/subscriptions")}>
+      <MenuItem onClick={() => handleNavigate("/subscription")}>
         <ListItemIcon><CreditCard sx={{ color: "#fff" }} /></ListItemIcon>
         <Typography variant="body2">Subscriptions</Typography>
       </MenuItem>
