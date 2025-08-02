@@ -16,4 +16,6 @@ public interface UserService {
     User save(User user);
     User findEntityById(Long userId); // For internal use
 	UserDTO getUserByPhone(String phone);
+	void applyTrialSubscription(User user);
+	
 }
