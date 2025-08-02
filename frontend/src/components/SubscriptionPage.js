@@ -1,16 +1,23 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
+import SubscribeButton from "../components/SubscribeButton";
 
 const SubscriptionPage = () => {
   const [user, setUser] = useState(null);
   const [subscription, setSubscription] = useState(null);
   const [timeLeft, setTimeLeft] = useState("");
+  const [userId, setUserId] = useState(null);
 
-  const userId = localStorage.getItem("userId");
   const token = localStorage.getItem("token");
+  const planRef = useRef(null);
 
-  const planRef = useRef(null); // used for scrolling
+  useEffect(() => {
+    const uid = localStorage.getItem("userId");
+    if (uid) {
+      setUserId(uid);
+    }
+  }, []);
 
   useEffect(() => {
     if (!userId || !token) return;
@@ -19,11 +26,11 @@ const SubscriptionPage = () => {
       try {
         const [userRes, subRes] = await Promise.all([
           axios.get(`http://localhost:8080/api/users/${userId}`, {
-            headers: { Authorization: `Bearer ${token}` }
+            headers: { Authorization: `Bearer ${token}` },
           }),
           axios.get(`http://localhost:8080/api/subscription/user/${userId}`, {
-            headers: { Authorization: `Bearer ${token}` }
-          })
+            headers: { Authorization: `Bearer ${token}` },
+          }),
         ]);
 
         setUser(userRes.data);
@@ -65,7 +72,7 @@ const SubscriptionPage = () => {
     new Date(dateStr).toLocaleDateString("en-IN", {
       year: "numeric",
       month: "short",
-      day: "numeric"
+      day: "numeric",
     });
 
   const getDaysLeft = (endDate) => {
@@ -81,41 +88,38 @@ const SubscriptionPage = () => {
     }
   };
 
-  const handleSubscribeClick = (planType) => {
-    // Simulate checkout (replace with real redirect)
-    console.log("Redirect to checkout:", planType);
-    // e.g. navigate(`/checkout?plan=${planType}`);
-  };
-
   const plans = [
     {
       name: "Starter Plan (1 Month)",
       price: "₹299",
+      planValue: 1,
       features: [
         "🔓 Real-time market data access",
         "📈 Track up to 5 alerts",
         "🧾 Add 15 coins to your watchlist",
         "🔔 24h price & volume change alerts",
-        "🙋 Ideal for curious beginners"
-      ]
+        "🙋 Ideal for curious beginners",
+      ],
     },
     {
       name: "Pro Plan (3 Months)",
       price: "₹749",
+      planValue: 3,
       features: [
         "✅ All Starter benefits included",
         "📊 Add up to 15 alerts",
         "✉️ Choose Email or SMS alerts",
         "📬 Priority customer support",
         "💰 Save ₹148 (~17%)",
-        "🌟 Great for active traders"
+        "🌟 Great for active traders",
       ],
       highlight: true,
-      badge: "Most Popular"
+      badge: "Most Popular",
     },
     {
-      name: "Elite Plan (6 Months)",
-      price: "₹1299",
+      name: "Elite Plan (12 Months)",
+      price: "₹1999",
+      planValue: 12,
       features: [
         "🔥 All Pro benefits included",
         "♾️ Unlimited alerts & coins",
@@ -123,10 +127,10 @@ const SubscriptionPage = () => {
         "🚀 Advanced filtering system",
         "🧪 Early access to new features",
         "📞 VIP support for fast resolutions",
-        "💸 Save ₹495 (~28%)",
-        "💼 Perfect for portfolio managers"
-      ]
-    }
+        "💸 Save ₹589 (~29%)",
+        "🏆 Best value for long-term users",
+      ],
+    },
   ];
 
   return (
@@ -142,8 +146,15 @@ const SubscriptionPage = () => {
             Hello <strong>{user.name}</strong>
             <br />
             Current Plan:{" "}
-            <span style={{ ...styles.trial, color: subscription.active ? "#00ffae" : "red" }}>
-              {subscription.subscriptionType} ({subscription.active ? "Active" : "Inactive"})
+            <span
+              style={{
+                ...styles.trial,
+                color: subscription.active ? "#00ffae" : "red",
+              }}
+            >
+              {subscription.subscriptionType} ({
+                subscription.active ? "Active" : "Inactive"
+              })
             </span>
             <br />
             Valid: <strong>{formatDate(subscription.startDate)}</strong> –{" "}
@@ -170,51 +181,39 @@ const SubscriptionPage = () => {
       </div>
 
       <div ref={planRef} style={styles.planContainer}>
-        {plans.map((plan, index) => {
-          const isCurrentPlan =
-            subscription &&
-            subscription.subscriptionType &&
-            plan.name.toLowerCase().includes(subscription.subscriptionType.toLowerCase());
-
-          return (
-            <motion.div
-              key={index}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.98 }}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.2 }}
-              style={{
-                ...styles.card,
-                ...(plan.highlight ? styles.highlight : {})
-              }}
-            >
-              {plan.badge && <div style={styles.badge}>{plan.badge}</div>}
-              <h2>{plan.name}</h2>
-              <p style={styles.price}>{plan.price}</p>
-              <ul style={styles.featureList}>
-                {plan.features.map((f, i) => (
-                  <li key={i} style={styles.featureItem}>{f}</li>
-                ))}
-              </ul>
-              <motion.button
-                style={{
-                  ...styles.subscribeBtn,
-                  backgroundColor: isCurrentPlan ? "#666" : "#ffc107",
-                  cursor: isCurrentPlan ? "not-allowed" : "pointer"
-                }}
-                whileHover={isCurrentPlan ? {} : { scale: 1.03 }}
-                whileTap={isCurrentPlan ? {} : { scale: 0.95 }}
-                disabled={isCurrentPlan}
-                onClick={() => {
-                  if (!isCurrentPlan) handleSubscribeClick(plan.name);
-                }}
-              >
-                {isCurrentPlan ? "Current Plan" : "Subscribe Now"}
-              </motion.button>
-            </motion.div>
-          );
-        })}
+        {plans.map((plan, index) => (
+          <motion.div
+            key={index}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.98 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.2 }}
+            style={{
+              ...styles.card,
+              ...(plan.highlight ? styles.highlight : {}),
+            }}
+          >
+            {plan.badge && <div style={styles.badge}>{plan.badge}</div>}
+            <h2>{plan.name}</h2>
+            <p style={styles.price}>{plan.price}</p>
+            <ul style={styles.featureList}>
+              {plan.features.map((f, i) => (
+                <li key={i} style={styles.featureItem}>
+                  {f}
+                </li>
+              ))}
+            </ul>
+            {user && userId && (
+              <SubscribeButton
+                userId={userId}
+                user={user}
+                plan={plan.planValue}
+                onSuccess={() => window.location.reload()}
+              />
+            )}
+          </motion.div>
+        ))}
       </div>
     </div>
   );
@@ -225,19 +224,19 @@ const styles = {
     padding: "80px 24px",
     backgroundColor: "#0e0e0e",
     color: "#f1f1f1",
-    minHeight: "100vh"
+    minHeight: "100vh",
   },
   headerSection: {
     textAlign: "center",
-    marginBottom: "3rem"
+    marginBottom: "3rem",
   },
   title: {
     fontSize: "2.75rem",
-    fontWeight: 700
+    fontWeight: 700,
   },
   subtitle: {
     fontSize: "1.1rem",
-    color: "#ccc"
+    color: "#ccc",
   },
   userInfo: {
     marginTop: "1.5rem",
@@ -246,10 +245,10 @@ const styles = {
     padding: "1rem",
     borderRadius: "1rem",
     display: "inline-block",
-    lineHeight: 1.6
+    lineHeight: 1.6,
   },
   trial: {
-    fontWeight: "bold"
+    fontWeight: "bold",
   },
   remainingDays: {
     backgroundColor: "#292929",
@@ -257,7 +256,7 @@ const styles = {
     padding: "0.4rem 0.8rem",
     borderRadius: "0.5rem",
     display: "inline-block",
-    marginTop: "0.5rem"
+    marginTop: "0.5rem",
   },
   countdown: {
     backgroundColor: "#1e1e1e",
@@ -266,7 +265,7 @@ const styles = {
     borderRadius: "0.5rem",
     fontSize: "0.9rem",
     marginTop: "0.5rem",
-    display: "inline-block"
+    display: "inline-block",
   },
   renewBtn: {
     padding: "0.6rem 1.4rem",
@@ -277,13 +276,13 @@ const styles = {
     fontWeight: 600,
     fontSize: "1rem",
     cursor: "pointer",
-    marginTop: "1rem"
+    marginTop: "1rem",
   },
   planContainer: {
     display: "flex",
     flexWrap: "wrap",
     justifyContent: "center",
-    gap: "2rem"
+    gap: "2rem",
   },
   card: {
     backgroundColor: "#1a1a1a",
@@ -292,28 +291,28 @@ const styles = {
     width: "300px",
     boxShadow: "0 0 20px rgba(255, 255, 255, 0.05)",
     textAlign: "center",
-    position: "relative"
+    position: "relative",
   },
   highlight: {
     border: "2px solid #ffc107",
-    backgroundColor: "#222"
+    backgroundColor: "#222",
   },
   price: {
     fontSize: "1.5rem",
     color: "#ffc107",
-    marginBottom: "1rem"
+    marginBottom: "1rem",
   },
   featureList: {
     listStyle: "none",
     padding: 0,
     textAlign: "left",
     fontSize: "0.95rem",
-    marginBottom: "1.5rem"
+    marginBottom: "1.5rem",
   },
   featureItem: {
     marginBottom: "0.5rem",
     paddingLeft: "1rem",
-    position: "relative"
+    position: "relative",
   },
   subscribeBtn: {
     padding: "0.75rem 1.5rem",
@@ -321,7 +320,7 @@ const styles = {
     borderRadius: "0.75rem",
     color: "#000",
     fontWeight: 600,
-    fontSize: "1rem"
+    fontSize: "1rem",
   },
   badge: {
     position: "absolute",
@@ -334,8 +333,8 @@ const styles = {
     padding: "0.25rem 0.75rem",
     borderRadius: "999px",
     fontSize: "0.85rem",
-    boxShadow: "0 0 10px rgba(255, 193, 7, 0.5)"
-  }
+    boxShadow: "0 0 10px rgba(255, 193, 7, 0.5)",
+  },
 };
 
 export default SubscriptionPage;
