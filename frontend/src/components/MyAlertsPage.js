@@ -64,6 +64,21 @@ export default function MyAlertsPage() {
       });
   };
 
+  const handlePauseResume = (id, isPaused) => {
+    const endpoint = isPaused ? "resume" : "pause";
+    axios
+      .put(`http://localhost:8080/api/alerts/${id}/${endpoint}`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then(() => {
+        toast.success(isPaused ? "▶️ Alert resumed" : "⏸️ Alert paused");
+        fetchAlerts();
+      })
+      .catch(() => {
+        toast.error("❌ Failed to update alert status");
+      });
+  };
+
   const closeModal = () => {
     setEditingAlert(null);
     fetchAlerts();
@@ -109,6 +124,7 @@ export default function MyAlertsPage() {
               <th style={{ padding: "12px" }}>Alert Type</th>
               <th style={{ padding: "12px" }}>Target Price</th>
               <th style={{ padding: "12px" }}>Created</th>
+              <th style={{ padding: "12px" }}>Status</th>
               <th style={{ padding: "12px" }}>Actions</th>
             </tr>
           </thead>
@@ -160,12 +176,15 @@ export default function MyAlertsPage() {
                 <td style={{ padding: "12px", color: "#bbb", textAlign: "center" }}>
                   {new Date(a.createdAt).toLocaleString()}
                 </td>
+                <td style={{ padding: "12px", textAlign: "center", color: a.paused ? "#999" : "#4caf50" }}>
+                  {a.paused ? "Paused" : "Active"}
+                </td>
                 <td
                   style={{
                     padding: "12px",
                     display: "flex",
-                    gap: "16px",
-                    alignItems: "center",
+                    gap: "10px",
+                    flexWrap: "wrap",
                     justifyContent: "center",
                   }}
                 >
@@ -174,7 +193,7 @@ export default function MyAlertsPage() {
                       border: "1px solid #fcd535",
                       background: "transparent",
                       color: "#fcd535",
-                      padding: "5px 12px",
+                      padding: "5px 10px",
                       borderRadius: "4px",
                       cursor: "pointer",
                     }}
@@ -182,19 +201,31 @@ export default function MyAlertsPage() {
                   >
                     Edit
                   </button>
-
                   <button
                     onClick={() => handleDeleteAlert(a.alertId)}
                     style={{
                       border: "1px solid #f6465d",
                       background: "transparent",
                       color: "#f6465d",
-                      padding: "5px 12px",
+                      padding: "5px 10px",
                       borderRadius: "4px",
                       cursor: "pointer",
                     }}
                   >
                     Delete
+                  </button>
+                  <button
+                    onClick={() => handlePauseResume(a.alertId, a.paused)}
+                    style={{
+                      border: `1px solid ${a.paused ? "#4caf50" : "#999"}`,
+                      background: "transparent",
+                      color: a.paused ? "#4caf50" : "#999",
+                      padding: "5px 10px",
+                      borderRadius: "4px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {a.paused ? "Resume" : "Pause"}
                   </button>
                 </td>
               </tr>
