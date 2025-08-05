@@ -7,11 +7,11 @@ import {
 } from "@mui/material";
 import {
   Person,
-  Settings,
   Logout,
   ListAlt,
   NotificationsActive,
-  CreditCard
+  CreditCard,
+  Dashboard
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { useLogin } from "../context/LoginContext";
@@ -28,15 +28,13 @@ export default function ProfileDropdown({ anchorEl, onClose }) {
   };
 
   const handleLogout = () => {
-    logout(); // call context logout
+    logout();
     onClose();
     toast.success("Logged out successfully");
     navigate("/");
-
-    // Optional: force UI reload if some components don't react to context
     setTimeout(() => {
       window.location.reload();
-    }, 500); // short delay ensures toast is visible before reload
+    }, 500);
   };
 
   return (
@@ -61,6 +59,11 @@ export default function ProfileDropdown({ anchorEl, onClose }) {
       transformOrigin={{ horizontal: "right", vertical: "top" }}
       anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
     >
+      <MenuItem onClick={() => handleNavigate("/dashboard")}>
+        <ListItemIcon><Dashboard sx={{ color: "#fff" }} /></ListItemIcon>
+        <Typography variant="body2">Dashboard</Typography>
+      </MenuItem>
+
       <MenuItem onClick={() => handleNavigate("/profile")}>
         <ListItemIcon><Person sx={{ color: "#fff" }} /></ListItemIcon>
         <Typography variant="body2">My Profile</Typography>
@@ -71,7 +74,7 @@ export default function ProfileDropdown({ anchorEl, onClose }) {
         <Typography variant="body2">My Alerts</Typography>
       </MenuItem>
 
-      <MenuItem onClick={() => handleNavigate("/notification-preferences")}>
+      <MenuItem onClick={() => handleNavigate("/preferences")}>
         <ListItemIcon><NotificationsActive sx={{ color: "#fff" }} /></ListItemIcon>
         <Typography variant="body2">Notification Preferences</Typography>
       </MenuItem>
@@ -82,11 +85,6 @@ export default function ProfileDropdown({ anchorEl, onClose }) {
       </MenuItem>
 
       <Divider sx={{ bgcolor: "#333" }} />
-
-      <MenuItem onClick={() => handleNavigate("/settings")}>
-        <ListItemIcon><Settings sx={{ color: "#fff" }} /></ListItemIcon>
-        <Typography variant="body2">Settings</Typography>
-      </MenuItem>
 
       <MenuItem onClick={handleLogout}>
         <ListItemIcon><Logout sx={{ color: "#fff" }} /></ListItemIcon>
