@@ -17,12 +17,13 @@ export default function AlertComponent({ symbol: propSymbol, editingAlert, onFin
   const [targetPrice, setTargetPrice] = useState("");
   const [alertType, setAlertType] = useState("above");
   const [currentPrice, setCurrentPrice] = useState(null);
+  const [cooldown, setCooldown] = useState(60); // Default to 60 minutes
 
-  // Set initial form values
   useEffect(() => {
     if (editingAlert) {
       setTargetPrice(editingAlert.alertPrice);
       setAlertType(editingAlert.alertType);
+      setCooldown(editingAlert.notificationCooldownMinutes || 60);
     } else if (symbol) {
       axios
         .get(`http://localhost:8080/api/market/${symbol}`)
@@ -43,12 +44,12 @@ export default function AlertComponent({ symbol: propSymbol, editingAlert, onFin
       cryptoSymbol: symbol,
       alertPrice: parseFloat(targetPrice),
       alertType,
+      notificationCooldownMinutes: cooldown,
     };
 
     const config = { headers: { Authorization: `Bearer ${token}` } };
 
     if (editingAlert) {
-      // UPDATE alert
       axios
         .put(`http://localhost:8080/api/alerts/update/${editingAlert.alertId}`, payload, config)
         .then(() => {
@@ -57,7 +58,6 @@ export default function AlertComponent({ symbol: propSymbol, editingAlert, onFin
         })
         .catch(() => toast.error("❌ Failed to update alert"));
     } else {
-      // CREATE new alert
       axios
         .post(`http://localhost:8080/api/alerts/add`, payload, config)
         .then(() => {
@@ -65,9 +65,17 @@ export default function AlertComponent({ symbol: propSymbol, editingAlert, onFin
           onFinish?.();
           setAlertType("above");
           setTargetPrice(currentPrice?.toFixed(2) || "");
+          setCooldown(60);
         })
         .catch(() => toast.error("❌ Failed to set alert"));
     }
+  };
+
+  const getCooldownLabel = (mins) => {
+    if (mins < 60) return `${mins} minutes`;
+    if (mins === 60) return `1 hour`;
+    if (mins < 1440) return `${Math.round(mins / 60)} hours`;
+    return `${Math.round(mins / 1440)} day(s)`;
   };
 
   if (!isLoggedIn) {
@@ -75,12 +83,19 @@ export default function AlertComponent({ symbol: propSymbol, editingAlert, onFin
   }
 
   return (
-    <div style={{ color: "#fff", padding: "8px 0" }}>
+    <div
+      style={{
+        color: "#fff",
+        padding: "8px 0",
+        boxShadow: "0 8px 30px rgba(0, 0, 0, 0.8)", // extended shadow
+        borderRadius: "8px",
+      }}
+    >
       <h4 style={{ color: "#fcd535", marginBottom: "10px" }}>
         {editingAlert ? "✏️ Edit Alert" : `Set Price Alert for ${symbol?.toUpperCase()}`}
       </h4>
 
-      <div style={{ display: "flex", gap: "12px", alignItems: "center", marginBottom: "12px" }}>
+      <div style={{ display: "flex", gap: "12px", alignItems: "center", marginBottom: "12px", flexWrap: "wrap" }}>
         <input
           type="number"
           placeholder="Target Price"
@@ -94,6 +109,7 @@ export default function AlertComponent({ symbol: propSymbol, editingAlert, onFin
             color: "#fff",
           }}
         />
+
         <select
           value={alertType}
           onChange={(e) => setAlertType(e.target.value)}
@@ -108,20 +124,52 @@ export default function AlertComponent({ symbol: propSymbol, editingAlert, onFin
           <option value="above">Above</option>
           <option value="below">Below</option>
         </select>
+
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <label style={{ fontSize: "13px", marginBottom: "4px", color: "#ccc" }}>Notify every:</label>
+          <select
+            value={cooldown}
+            onChange={(e) => setCooldown(Number(e.target.value))}
+            style={{
+              padding: "6px 10px",
+              borderRadius: "6px",
+              border: "1px solid #444",
+              backgroundColor: "#0e1117",
+              color: "#fff",
+              width: "120px",
+            }}
+          >
+            <option value={5}>5 min</option>
+            <option value={15}>15 min</option>
+            <option value={30}>30 min</option>
+            <option value={60}>1 hour</option>
+            <option value={180}>3 hours</option>
+            <option value={360}>6 hours</option>
+            <option value={720}>12 hours</option>
+            <option value={1440}>1 day</option>
+          </select>
+        </div>
+
         <button
           onClick={handleSubmit}
           style={{
-            padding: "6px 14px",
+            height: "38px",
+            padding: "0px 16px",
             backgroundColor: "#fcd535",
             color: "#000",
             fontWeight: "bold",
             border: "none",
             borderRadius: "6px",
             cursor: "pointer",
+            alignSelf: "center",
           }}
         >
           {editingAlert ? "Update" : "Set Alert"}
         </button>
+      </div>
+
+      <div style={{ fontSize: "13px", color: "#aaa", marginBottom: "10px" }}>
+        You’ll be notified once every <b>{getCooldownLabel(cooldown)}</b>
       </div>
 
       {currentPrice && !editingAlert && (
