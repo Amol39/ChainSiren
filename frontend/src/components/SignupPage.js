@@ -3,6 +3,7 @@ import logo from "../assets/logo.png";
 import { Link, useNavigate } from "react-router-dom";
 import { FaGoogle, FaApple, FaTelegram } from "react-icons/fa";
 import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 
 export default function SignupPage() {
     const navigate = useNavigate();
@@ -22,22 +23,34 @@ export default function SignupPage() {
     }, [navigate]);
 
     const handleNext = async () => {
-        if (!email) return alert("Please enter your email or phone");
+        if (!email) {
+            toast.error("Please enter your email or phone");
+            return;
+        }
 
-        if (!termsAccepted) return alert("Please accept the Terms of Service and Privacy Policy");
+        if (!termsAccepted) {
+            toast.error("Please accept the Terms of Service and Privacy Policy");
+            return;
+        }
 
-        if (!isAvailable) return alert("This email/phone is already registered");
+        if (!isAvailable) {
+            toast.error("This email/phone is already registered");
+            return;
+        }
 
         if (isPhone && email.length !== 10) {
-            return alert("Phone number must be exactly 10 digits");
+            toast.error("Phone number must be exactly 10 digits");
+            return;
         }
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!isPhone && !emailRegex.test(email)) {
-            return alert("Please enter a valid email address");
+            toast.error("Please enter a valid email address");
+            return;
         }
 
         // ✅ Navigate immediately
+        toast.success("OTP sent! Redirecting...");
         navigate("/verify", { state: { email } });
 
         // ⏳ Send OTP in background
@@ -47,6 +60,7 @@ export default function SignupPage() {
             body: JSON.stringify({ email }),
         }).catch((err) => {
             console.error("OTP send failed:", err);
+            toast.error("Failed to send OTP");
         });
     };
 
@@ -99,6 +113,7 @@ export default function SignupPage() {
 
     return (
         <div className="login_page" style={{ backgroundColor: "#0b0e11", height: "100vh", display: "flex", justifyContent: "center", alignItems: "center", fontFamily: "sans-serif" }}>
+
             <div style={{ backgroundColor: "#181a20", padding: "32px 24px", borderRadius: "16px", width: "320px", color: "#fff", boxShadow: "0 0 0 1px #2b3139" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
