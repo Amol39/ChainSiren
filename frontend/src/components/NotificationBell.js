@@ -1,52 +1,78 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { FaBell } from "react-icons/fa";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const NotificationBell = () => {
   const [notifications, setNotifications] = useState([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const bellRef = useRef(null);
+  const prevUnreadCount = useRef(0);
 
   const token = localStorage.getItem("token");
   const userId = localStorage.getItem("userId");
 
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     try {
       if (!userId || !token) return;
+
       const res = await axios.get(
         `http://localhost:8080/api/notifications/user/${userId}`,
-        { headers: { Authorization: `Bearer ${token}` } }
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
       );
-      setNotifications(res.data || []);
+
+      const data = res.data || [];
+      const newUnread = data.filter((n) => !n.read).length;
+
+      // Show toast for newly arrived notifications
+      if (newUnread > prevUnreadCount.current) {
+        const newNotifs = data
+          .filter((n) => !n.read)
+          .slice(0, newUnread - prevUnreadCount.current);
+
+        newNotifs.forEach((n) => {
+          toast.info(`${n.cryptoSymbol}: ${n.message}`, {
+            icon: "🔔",
+          });
+        });
+      }
+
+      prevUnreadCount.current = newUnread;
+      setNotifications(data);
     } catch (err) {
       console.error("Error fetching notifications: ", err);
     }
-  };
+  }, [userId, token]);
 
-  const markAllAsRead = async () => {
+  const markAllAsRead = useCallback(async () => {
     try {
+      if (!userId || !token) return;
+
       await axios.put(
         `http://localhost:8080/api/notifications/mark-read/${userId}`,
         {},
-        { headers: { Authorization: `Bearer ${token}` } }
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
       );
     } catch (err) {
       console.error("Failed to mark notifications as read: ", err);
     }
-  };
+  }, [userId, token]);
 
   const toggleDropdown = async () => {
     const open = !dropdownOpen;
     setDropdownOpen(open);
     if (open) {
-      await markAllAsRead(); // Persist read state
-      await fetchNotifications(); // Refresh to get updated "read" status
+      await markAllAsRead();
+      await fetchNotifications();
     }
   };
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (bellRef.current && !bellRef.current.contains(event.target)) {
@@ -56,6 +82,12 @@ const NotificationBell = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    fetchNotifications(); // initial fetch
+    const interval = setInterval(fetchNotifications, 30000); // poll every 30s
+    return () => clearInterval(interval);
+  }, [fetchNotifications]);
 
   return (
     <div ref={bellRef} style={{ position: "relative" }}>
@@ -142,8 +174,8 @@ const NotificationBell = () => {
                 margin: 0,
                 maxHeight: "220px",
                 overflowY: "auto",
-                scrollbarWidth: "none", // Firefox
-                msOverflowStyle: "none", // Edge, IE
+                scrollbarWidth: "none",
+                msOverflowStyle: "none",
               }}
               className="notification-list"
             >
@@ -159,14 +191,17 @@ const NotificationBell = () => {
                     borderRadius: "6px",
                     marginBottom: "2px",
                     cursor: "default",
-                    backgroundColor: notification.read ? "transparent" : "#2a2a2a",
+                    backgroundColor: notification.read
+                      ? "transparent"
+                      : "#2a2a2a",
                   }}
                   onMouseEnter={(e) =>
                     (e.currentTarget.style.background = "#333")
                   }
                   onMouseLeave={(e) =>
-                    (e.currentTarget.style.background =
-                      notification.read ? "transparent" : "#2a2a2a")
+                    (e.currentTarget.style.background = notification.read
+                      ? "transparent"
+                      : "#2a2a2a")
                   }
                 >
                   <strong style={{ color: "#1db954" }}>
@@ -180,7 +215,6 @@ const NotificationBell = () => {
         </div>
       )}
 
-      {/* Hide scrollbars (Chrome/Safari) */}
       <style>{`
         .notification-list::-webkit-scrollbar {
           display: none;
