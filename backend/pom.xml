@@ -10,11 +10,10 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
-	<artifactId>TradeStorm</artifactId>
+	<artifactId>chainsiren-backend</artifactId>
 	<version>0.0.1</version>
-	<name>TradeStorm</name>
-	<description>Spring Boot Template project for developing REST APIs in a Full
-		Stack Application</description>
+	<name>ChainSiren Backend</name>
+	<description>Spring Boot REST API backend for ChainSiren cryptocurrency monitoring platform.</description>
 	<url />
 	<licenses>
 		<license />
